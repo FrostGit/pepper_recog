@@ -1,230 +1,248 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-RoArm-M3-S 机械臂完整使用示例
-功能：记录初始位置 → 移动到目标点 → 夹爪操作 → 返回初始位置
-
-Author: 霜叶
-Date: 2026
+机械臂笛卡尔坐标控制示例
+重点演示 move_xyzt_goal 和 move_xyzt_direct 的区别
 """
 
 import time
-import sys
-from roarm_m3 import RoArmM3S, ArmState  # 假设保存为 roarm_m3s.py
+from robot_arm_lib import RobotArmController
 
-
-# ============== 配置参数 ==============
-
-# 串口配置
-SERIAL_PORT = "/dev/ttyUSB0"  # Linux: /dev/ttyUSB0, Windows: COM3/COM4
+# ================= 配置区 =================
+PORT = "/dev/ttyUSB0"              # 修改为你的串口
 BAUDRATE = 115200
-
-# 目标位置 (mm)
-TARGET_X = 300
-TARGET_Y = 0
-TARGET_Z = 250
-TARGET_PITCH = 0      # 弧度，0 表示水平
-TARGET_ROLL = 0       # 弧度
-TARGET_GRIPPER_OPEN = 0.5    # 夹爪张开角度 (弧度，约 28°)
-TARGET_GRIPPER_CLOSE = 3.14  # 夹爪闭合角度 (弧度，约 180°)
-
-# 运动参数
-MOVE_SPEED = 0.3      # 速度系数 (0-1)
-MOVE_TIMEOUT = 10.0   # 移动超时时间 (秒)
+SAFE_MODE = True           # 安全模式：限制速度
+MAX_SPEED = 0.15           # 安全速度
+# =========================================
 
 
-# ============== 状态回调函数 ==============
+def print_status(arm: RobotArmController):
+    """打印当前状态"""
+    pos = arm.get_position()
+    if pos:
+        print(f"  当前位置：X={pos['x']:.2f}, Y={pos['y']:.2f}, Z={pos['z']:.2f}")
+    else:
+        print("  位置：暂无数据")
 
-def on_state_update(state: ArmState):
-    """状态更新回调（实时打印关键信息）"""
-    print(f"  [状态] 位置: [{state.x:6.1f}, {state.y:6.1f}, {state.z:6.1f}]mm | "
-          f"电压: {state.voltage:.1f}V | "
-          f"夹爪: {'闭合' if state.is_gripper_closed else '张开'}")
+
+def test_move_xyzt_goal(arm: RobotArmController):
+    """
+    测试 move_xyzt_goal（阻塞式）
+    特点：机械臂内部阻塞，运动完成后才返回
+    适用：单点精确运动
+    """
+    print("\n" + "="*50)
+    print("测试 1: move_xyzt_goal (阻塞式)")
+    print("="*50)
+    
+    # 获取当前位置
+    start_pos = arm.get_position()
+    if not start_pos:
+        print("❌ 无法获取当前位置，跳过测试")
+        return
+    
+    print(f"起始位置：X={start_pos['x']:.2f}, Y={start_pos['y']:.2f}, Z={start_pos['z']:.2f}")
+    
+    # 目标位置（Z 轴上升 20mm）
+    target = {
+        'x': start_pos['x'],
+        'y': start_pos['y'],
+        'z': start_pos['z'] + 20,
+        't': 0,
+        'r': 0,
+        'g': 3.14
+    }
+    
+    print(f"目标位置：X={target['x']:.2f}, Y={target['y']:.2f}, Z={target['z']:.2f}")
+    print("🔄 开始运动（阻塞式）...")
+    
+    start_time = time.time()
+    
+    # 发送指令（阻塞式）
+    arm.move_xyzt_goal(
+        x=target['x'],
+        y=target['y'],
+        z=target['z'],
+        t=target['t'],
+        r=target['r'],
+        g=target['g'],
+        spd=MAX_SPEED
+    )
+    
+    # 等待运动完成（根据距离调整）
+    time.sleep(3)
+    
+    elapsed = time.time() - start_time
+    print(f"✅ 运动完成，耗时：{elapsed:.2f} 秒")
+    
+    # 检查位置
+    end_pos = arm.get_position()
+    if end_pos:
+        print(f"结束位置：X={end_pos['x']:.2f}, Y={end_pos['y']:.2f}, Z={end_pos['z']:.2f}")
+    
+    time.sleep(1)
 
 
-# ============== 主程序 ==============
+def test_move_xyzt_direct(arm: RobotArmController):
+    """
+    测试 move_xyzt_direct（非阻塞式）
+    特点：发送后立即返回，适合连续轨迹
+    适用：多点连续运动、轨迹跟踪
+    """
+    print("\n" + "="*50)
+    print("测试 2: move_xyzt_direct (非阻塞式)")
+    print("="*50)
+    
+    start_pos = arm.get_position()
+    if not start_pos:
+        print("❌ 无法获取当前位置，跳过测试")
+        return
+    
+    print(f"起始位置：X={start_pos['x']:.2f}, Y={start_pos['y']:.2f}, Z={start_pos['z']:.2f}")
+    
+    # 定义多个目标点（方形轨迹）
+    waypoints = [
+        {'x': start_pos['x'] + 10, 'y': start_pos['y'], 'z': start_pos['z']},
+        {'x': start_pos['x'] + 10, 'y': start_pos['y'] + 10, 'z': start_pos['z']},
+        {'x': start_pos['x'], 'y': start_pos['y'] + 10, 'z': start_pos['z']},
+        {'x': start_pos['x'], 'y': start_pos['y'], 'z': start_pos['z']},
+    ]
+    
+    print(f"📍 轨迹点数：{len(waypoints)}")
+    print("🔄 开始连续运动（非阻塞式）...")
+    
+    start_time = time.time()
+    
+    # 连续发送多个目标点
+    for i, point in enumerate(waypoints):
+        print(f"  第 {i+1} 点：X={point['x']:.2f}, Y={point['y']:.2f}, Z={point['z']:.2f}")
+        
+        arm.move_xyzt_direct(
+            x=point['x'],
+            y=point['y'],
+            z=point['z'],
+            t=0,
+            r=0,
+            g=3.14
+        )
+        
+        # 短暂等待，让机械臂有时间响应
+        time.sleep(0.5)
+        
+        # 实时监控位置
+        pos = arm.get_position()
+        if pos:
+            print(f"    → 实时位置：X={pos['x']:.2f}, Y={pos['y']:.2f}, Z={pos['z']:.2f}")
+    
+    elapsed = time.time() - start_time
+    print(f"✅ 轨迹完成，总耗时：{elapsed:.2f} 秒")
+    
+    time.sleep(2)
+
+
+def test_comparison(arm: RobotArmController):
+    """
+    对比两种运动方式
+    """
+    print("\n" + "="*50)
+    print("测试 3: 两种方式对比")
+    print("="*50)
+    
+    start_pos = arm.get_position()
+    if not start_pos:
+        return
+    
+    # 方式 1: goal（阻塞）
+    print("\n【方式 1】move_xyzt_goal")
+    t1 = time.time()
+    arm.move_xyzt_goal(
+        x=start_pos['x'], y=start_pos['y'], 
+        z=start_pos['z'] + 10, t=0, r=0, g=3.14,
+        spd=MAX_SPEED
+    )
+    time.sleep(2)
+    t1_elapsed = time.time() - t1
+    print(f"  耗时：{t1_elapsed:.2f} 秒（含等待）")
+    
+    # 方式 2: direct（非阻塞）
+    print("\n【方式 2】move_xyzt_direct")
+    t2 = time.time()
+    arm.move_xyzt_direct(
+        x=start_pos['x'], y=start_pos['y'], 
+        z=start_pos['z'], t=0, r=0, g=3.14
+    )
+    t2_elapsed = time.time() - t2
+    print(f"  耗时：{t2_elapsed:.2f} 秒（立即返回）")
+    
+    print(f"\n⏱️  时间差：{t1_elapsed - t2_elapsed:.2f} 秒")
+
 
 def main():
-    print("=" * 60)
-    print("🤖 RoArm-M3-S 机械臂控制示例")
-    print("=" * 60)
+    """主函数"""
+    print("="*60)
+    print("🤖 机械臂笛卡尔坐标控制示例")
+    print("="*60)
+    print(f"串口：{PORT}")
+    print(f"波特率：{BAUDRATE}")
+    print(f"安全速度：{MAX_SPEED}")
+    print("="*60)
     
-    # 1️⃣ 连接机械臂
-    print("\n[1/6] 连接机械臂...")
-    arm = RoArmM3S(port=SERIAL_PORT, baudrate=BAUDRATE)
-    
-    if not arm.connect():
-        print("❌ 连接失败，请检查串口配置")
-        sys.exit(1)
-    
-    print("✅ 连接成功")
-    
-    # 注册状态回调（可选，用于实时监控）
-    arm.register_state_callback(on_state_update)
+    # 创建控制器
+    arm = RobotArmController(port=PORT, baudrate=BAUDRATE)
     
     try:
-        # 2️⃣ 等待初始状态稳定
-        print("\n[2/6] 等待机械臂状态稳定...")
-        time.sleep(1)
+        # 连接
+        print("\n🔌 正在连接机械臂...")
+        if not arm.connect(max_retries=3):
+            print("❌ 连接失败，请检查串口配置")
+            return
         
-        # 主动请求一次反馈，确保获取到最新状态
-        initial_state = arm.request_state_feedback(timeout=2.0)
-        if not initial_state:
-            print("⚠️  未能获取初始状态，继续执行...")
-            initial_state = arm.current_state
+        print("✅ 连接成功")
         
-        if initial_state:
-            print(f"✅ 初始位置：X={initial_state.x:.1f}, Y={initial_state.y:.1f}, Z={initial_state.z:.1f} mm")
-            print(f"   初始夹爪角度：{initial_state.gripper:.2f} rad ({initial_state.gripper*180/3.14:.1f}°)")
+        # 等待初始状态
+        print("⏳ 等待初始状态...")
+        time.sleep(2)
+        
+        # 检查状态
+        if not arm.is_status_fresh(max_age=3.0):
+            print("⚠️  警告：状态数据可能过期")
         else:
-            print("⚠️  无法读取初始状态")
+            print("✅ 状态数据正常")
         
-        # 记录初始位置（用于返回）
-        init_x = initial_state.x if initial_state else 235
-        init_y = initial_state.y if initial_state else 0
-        init_z = initial_state.z if initial_state else 234
-        init_pitch = initial_state.pitch if initial_state else 0
-        init_roll = initial_state.roll if initial_state else 0
-        init_gripper = initial_state.gripper if initial_state else 3.14
+        print_status(arm)
         
-        time.sleep(1)
+        # 运行测试
+        test_move_xyzt_goal(arm)
+        test_move_xyzt_direct(arm)
+        test_comparison(arm)
         
-        # 3️⃣ 移动到目标位置
-        print(f"\n[3/6] 移动到目标位置 (X={TARGET_X}, Y={TARGET_Y}, Z={TARGET_Z})...")
-        success = arm.move_to_xyz(
-            x=TARGET_X,
-            y=TARGET_Y,
-            z=TARGET_Z,
-            pitch=TARGET_PITCH,
-            roll=TARGET_ROLL,
-            gripper=init_gripper,  # 保持当前夹爪状态
-            spd=MOVE_SPEED,
-            blocking=True
+        # 回到安全位置
+        print("\n🏠 返回安全位置...")
+        arm.move_xyzt_goal(
+            x=235, y=0, z=234, t=0, r=0, g=3.14,
+            spd=MAX_SPEED
         )
+        time.sleep(3)
         
-        if success:
-            print("✅ 到达目标位置")
-            # 验证位置
-            current_pos = arm.get_current_position(timeout=2.0)
-            if current_pos:
-                print(f"   实际位置：X={current_pos['x']:.1f}, Y={current_pos['y']:.1f}, Z={current_pos['z']:.1f} mm")
-        else:
-            print("❌ 移动失败或超时")
+        print_status(arm)
         
-        time.sleep(1)
-        
-        # 4️⃣ 张开夹爪
-        print(f"\n[4/6] 张开夹爪 (角度：{TARGET_GRIPPER_OPEN:.2f} rad)...")
-        # 使用关节角度控制夹爪（h 参数对应夹爪）
-        success = arm.move_joints_angle(
-            h=TARGET_GRIPPER_OPEN * 180 / 3.14,  # 转换为角度制
-            spd=0.5,
-            blocking=True
-        )
-        
-        if success:
-            print("✅ 夹爪已张开")
-            # 验证夹爪状态
-            state = arm.request_state_feedback(timeout=2.0)
-            if state:
-                print(f"   夹爪角度：{state.gripper:.2f} rad ({state.gripper*180/3.14:.1f}°)")
-        else:
-            print("❌ 夹爪操作失败")
-        
-        time.sleep(1)
-        
-        # 5️⃣ 关闭夹爪
-        print(f"\n[5/6] 关闭夹爪 (角度：{TARGET_GRIPPER_CLOSE:.2f} rad)...")
-        success = arm.move_joints_angle(
-            h=TARGET_GRIPPER_CLOSE * 180 / 3.14,  # 转换为角度制
-            spd=0.5,
-            blocking=True
-        )
-        
-        if success:
-            print("✅ 夹爪已闭合")
-            state = arm.request_state_feedback(timeout=2.0)
-            if state:
-                print(f"   夹爪角度：{state.gripper:.2f} rad ({state.gripper*180/3.14:.1f}°)")
-                print(f"   夹爪状态：{'闭合' if state.is_gripper_closed else '张开'}")
-        else:
-            print("❌ 夹爪操作失败")
-        
-        time.sleep(1)
-        
-        # 6️⃣ 返回初始位置
-        print(f"\n[6/6] 返回初始位置 (X={init_x:.1f}, Y={init_y:.1f}, Z={init_z:.1f})...")
-        success = arm.move_to_xyz(
-            x=init_x,
-            y=init_y,
-            z=init_z,
-            pitch=init_pitch,
-            roll=init_roll,
-            gripper=init_gripper,
-            spd=MOVE_SPEED,
-            blocking=True
-        )
-        
-        if success:
-            print("✅ 已返回初始位置")
-            final_state = arm.request_state_feedback(timeout=2.0)
-            if final_state:
-                print(f"   最终位置：X={final_state.x:.1f}, Y={final_state.y:.1f}, Z={final_state.z:.1f} mm")
-        else:
-            print("❌ 返回失败或超时")
-        
-        print("\n" + "=" * 60)
-        print("🎉 任务执行完成！")
-        print("=" * 60)
+        # 显示统计
+        stats = arm.get_stats()
+        print(f"\n📊 通信统计：")
+        print(f"  接收字节：{stats['bytes_received']}")
+        print(f"  接收消息：{stats['messages_received']}")
+        print(f"  解析错误：{stats['parse_errors']}")
         
     except KeyboardInterrupt:
-        print("\n⚠️  用户中断，正在安全停止...")
+        print("\n⚠️  用户中断")
     except Exception as e:
-        print(f"\n❌ 发生错误：{e}")
+        print(f"\n❌ 错误：{e}")
     finally:
         # 断开连接
-        print("\n[清理] 断开连接...")
+        print("\n🔌 断开连接...")
         arm.disconnect()
-        print("✅ 已安全断开")
+        print("✅ 完成")
 
-
-# ============== 简化版示例（快速测试） ==============
-
-def quick_test():
-    """快速测试版本，适合验证基本功能"""
-    print("🚀 快速测试模式")
-    
-    with RoArmM3S(port=SERIAL_PORT, baudrate=BAUDRATE) as arm:
-        if not arm.current_state:
-            time.sleep(1)
-        
-        # 移动到目标点
-        print("移动到 (300, 0, 250)...")
-        arm.move_to_xyz(300, 0, 250, blocking=True, spd=0.3)
-        time.sleep(1)
-        
-        # 张开夹爪
-        print("张开夹爪...")
-        arm.move_gripper_angle(45)  # 45 度
-        time.sleep(1)
-        
-        # 关闭夹爪
-        print("关闭夹爪...")
-        arm.move_gripper_angle(180)  # 180 度
-        time.sleep(1)
-        
-        # 返回原点
-        print("返回初始位置...")
-        arm.move_to_xyz(235, 0, 234, blocking=True, spd=0.3)
-        
-        print("✅ 测试完成")
-
-
-# ============== 入口 ==============
 
 if __name__ == "__main__":
-    # 运行完整示例
     main()
-    
-    # 或运行快速测试
-    # quick_test()
