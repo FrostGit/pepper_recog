@@ -3,6 +3,7 @@
 """
 YOLO 实时目标检测 - Jetson Orin Nano 优化版
 作者：霜叶
+功能：获取目标中心坐标 + 区域过滤 (ROI)
 """
 
 import cv2
@@ -20,6 +21,14 @@ SKIP_FRAMES = 1  # 每 N 帧检测一次，提升 FPS
 DISPLAY_FPS = True
 SAVE_VIDEO = False  # 是否保存输出视频
 OUTPUT_PATH = "output_{}.mp4".format(datetime.now().strftime("%Y%m%d_%H%M%S"))
+
+# ================= 新增：有效范围 (ROI) 配置 =================
+# 格式：左上角 (x1, y1), 右下角 (x2, y2)
+# 请根据实际画面分辨率 (1280x720) 调整此处坐标
+ROI_ENABLED = True       # 是否启用区域过滤
+ROI_X1, ROI_Y1 = 400, 150  # 区域左上角
+ROI_X2, ROI_Y2 = 900, 600 # 区域右下角
+# ===========================================
 
 # ================= 初始化模型 =================
 print("正在加载 YOLO 模型...")
@@ -69,15 +78,57 @@ try:
         frame_count += 1
         fps_frame_count += 1
 
+        # 创建绘制画面副本
+        annotated_frame = frame.copy()
+
+        # 1. 绘制有效范围区域 (ROI) 背景框，方便调试查看
+        if ROI_ENABLED:
+            cv2.rectangle(annotated_frame, (ROI_X1, ROI_Y1), (ROI_X2, ROI_Y2), (0, 0, 255), 2)
+            cv2.putText(annotated_frame, "ROI Zone", (ROI_X1, ROI_Y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
         # 每隔 SKIP_FRAMES 帧进行一次推理
         if frame_count % SKIP_FRAMES == 0:
             results = model(frame, verbose=False, device=device)
             result = results[0]
 
-            # 绘制检测结果
-            annotated_frame = result.plot()
+            # 获取检测框数据
+            boxes = result.boxes
+            
+            if boxes is not None:
+                for box in boxes:
+                    # 获取坐标 (tensor -> numpy)
+                    x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                    conf = box.conf[0].cpu().numpy()
+                    cls_id = int(box.cls[0].cpu().numpy())
+                    class_name = result.names[cls_id]
+
+                    # ================= 获取中心坐标 =================
+                    cx = int((x1 + x2) / 2)
+                    cy = int((y1 + y2) / 2)
+                    # ===============================================
+
+                    # ================= 区域过滤逻辑 =================
+                    if ROI_ENABLED:
+                        # 判断中心点是否在 ROI 范围内
+                        if not (ROI_X1 <= cx <= ROI_X2 and ROI_Y1 <= cy <= ROI_Y2):
+                            continue  # 如果不在范围内，跳过此目标，不绘制
+                    # ===============================================
+
+                    # 绘制符合条件的目标框
+                    color = (45, 150, 232)  # 绿色表示有效目标
+                    cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+                    
+                    # 绘制类别和置信度
+                    label = f"{class_name} {conf:.2f}"
+                    cv2.putText(annotated_frame, label, (int(x1), int(y1) - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+                    
+                    # 打印中心坐标到控制台 (可选)
+                    print(f"Target: {class_name}, Center: ({cx}, {cy})")
         else:
-            annotated_frame = frame
+            # 跳帧时不检测，直接显示上一帧或原帧 (这里保持原帧加 ROI 框)
+            pass
 
         # 显示 FPS
         if DISPLAY_FPS:
