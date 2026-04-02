@@ -22,8 +22,6 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QThread
 from PyQt5.QtGui import QTextCursor, QFont
-
-# ✅ 修复：使用正确的库名
 from roarm_m3 import RoArmM3S, ArmState
 
 
