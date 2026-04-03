@@ -170,6 +170,28 @@
             }
         }
 
+        /* 急停按钮样式 */
+        .emergency-btn {
+            padding: 9px 18px;
+            border: 2px solid #ff4444;
+            border-radius: 10px;
+            background: #ff4444;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(255, 68, 68, 0.3);
+        }
+
+        .emergency-btn:hover {
+            background: #cc0000;
+            border-color: #cc0000;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 68, 68, 0.4);
+        }
+
         .time-display {
             font-size: 15px;
             color: rgba(255, 255, 255, 0.95);
@@ -918,6 +940,7 @@
                 <button class="status-btn online">● 系统就绪</button>
                 <button class="status-btn" id="startRecognitionBtn" onclick="handleStartRecognition()">🔍 开始识别</button>
                 <button class="status-btn" id="startSortingBtn" onclick="handleStartSorting()">⚙️ 开始分拣</button>
+                <button class="emergency-btn" onclick="handleEmergencyStop()">🚨 急停</button>
                 <!-- 新增：日夜模式切换 -->
                 <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="切换日夜模式">☀️</button>
                 <div class="time-display" id="timeDisplay">09:01:24</div>
@@ -1272,6 +1295,31 @@
                 statusEl.className = 'video-status';
                 statusEl.innerHTML = '<div class="status-dot" style="background:var(--color-warning)"></div><span>待机</span>';
             }
+
+            // 更新按钮状态
+            updateButtons(data.recognizing, data.sorting);
+        }
+
+        // 更新按钮状态
+        function updateButtons(isRecognizing, isSorting) {
+            const recognitionBtn = document.getElementById('startRecognitionBtn');
+            const sortingBtn = document.getElementById('startSortingBtn');
+
+            if (isRecognizing) {
+                recognitionBtn.textContent = '🛑 停止识别';
+                recognitionBtn.onclick = handleStopRecognition;
+            } else {
+                recognitionBtn.textContent = '🔍 开始识别';
+                recognitionBtn.onclick = handleStartRecognition;
+            }
+
+            if (isSorting) {
+                sortingBtn.textContent = '🛑 停止分拣';
+                sortingBtn.onclick = handleStopSorting;
+            } else {
+                sortingBtn.textContent = '⚙️ 开始分拣';
+                sortingBtn.onclick = handleStartSorting;
+            }
         }
 
         // 更新信号条
@@ -1345,8 +1393,7 @@
                     isRecognizing = true;
                     startTime = startTime || Date.now();  // 记录开始时间
 
-                    btn.textContent = '🔄 识别中...';
-                    btn.style.borderColor = 'var(--color-success)';
+                    updateButtons(isRecognizing, isSorting);
 
                     addLog('✓ 识别模块已启动', 'success');
                     showNotification('识别已启动 ✓', 'success');
@@ -1395,8 +1442,7 @@
                     if (timerInterval) clearInterval(timerInterval);
                     timerInterval = setInterval(updateRunTime, 1000);
 
-                    btn.textContent = '⚙️ 分拣中...';
-                    btn.style.borderColor = 'var(--color-success)';
+                    updateButtons(isRecognizing, isSorting);
 
                     addLog('✓ 分拣执行已启动', 'success');
                     showNotification('分拣已启动 ✓', 'success');
@@ -1426,10 +1472,25 @@
             const result = await sendRequest('/recognition/stop', 'POST');
             if (result.success) {
                 isRecognizing = false;
-                document.getElementById('startRecognitionBtn').textContent = '🔍 开始识别';
-                document.getElementById('startRecognitionBtn').style.borderColor = '';
+                updateButtons(isRecognizing, isSorting);
                 addLog('🛑 识别模块已停止', 'warning');
                 showNotification('识别已停止', 'info');
+            }
+        }
+
+        // ✅ 急停功能
+        async function handleEmergencyStop() {
+            const result = await sendRequest('/emergency/stop', 'POST');
+            if (result.success) {
+                addLog('🚨 急停激活，已关闭扭矩锁', 'error');
+                showNotification('急停激活！', 'error');
+                // 停止所有操作
+                isRecognizing = false;
+                isSorting = false;
+                updateButtons(isRecognizing, isSorting);
+            } else {
+                addLog('❌ 急停失败', 'error');
+                showNotification('急停失败', 'error');
             }
         }
 
@@ -1438,8 +1499,7 @@
             const result = await sendRequest('/sorting/stop', 'POST');
             if (result.success) {
                 isSorting = false;
-                document.getElementById('startSortingBtn').textContent = '⚙️ 开始分拣';
-                document.getElementById('startSortingBtn').style.borderColor = '';
+                updateButtons(isRecognizing, isSorting);
                 addLog('🛑 分拣执行已停止', 'warning');
                 showNotification('分拣已停止', 'info');
             }

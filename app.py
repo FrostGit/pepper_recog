@@ -20,6 +20,8 @@ import numpy as np
 
 # 导入您的 YOLO 检测器（根据实际路径调整）
 from yolo26.yolo_detector import YOLODetector
+# 导入机械臂库
+from robot_arm_lib import RobotArmController
 
 # ================= 配置区 =================
 AUTH_KEY = "Tianjin HuaDa Tech"
@@ -50,11 +52,44 @@ PEPPER_COLORS = {
     "zunyi_s":   (220, 150, 240),
 }
 
+# 机械臂放置位置配置 (机械臂坐标系)
+PLACING_POSITIONS = {
+    "millet_dr": {"x": 250.0, "y": 50.0},   # 示例位置，需要根据实际调整
+    "millet_fr": {"x": 250.0, "y": 0.0},
+    "millet_fg": {"x": 250.0, "y": -50.0},
+    "lantern":   {"x": 200.0, "y": 50.0},
+    "zunyi_l":   {"x": 200.0, "y": 0.0},
+    "zunyi_s":   {"x": 200.0, "y": -50.0},
+}
+
+# 机械臂姿态配置
+GRIP_POSE = {
+    "z": -119.8311111,
+    "t": -0.122277778,
+    "r": -0.072666667,
+    "g": 1.202777778
+}
+
+INITIAL_POSE = {
+    "x": 91.24,
+    "y": 15.54,
+    "z": 112.5,
+    "t": 0.078,
+    "r": -0.145,
+    "g": 3.141
+}
+
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['JSON_AS_ASCII'] = False
 
 # 全局退出标志
 shutdown_event = threading.Event()
+
+# 全局退出标志
+shutdown_event = threading.Event()
+
+# 机械臂控制器 (全局实例)
+robot_arm = None
 
 # 日志配置
 logging.basicConfig(
@@ -87,6 +122,18 @@ def signal_handler(signum, frame):
 # 注册信号处理
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
+
+
+# ================= 坐标转换函数 =================
+def convert_yolo_to_arm(x, y):
+    """
+    将YOLO检测的像素坐标转换为机械臂坐标
+    X = 0.6242x - 195.16
+    Y = 0.6242y - 195.16
+    """
+    X = 0.6242 * x - 195.16
+    Y = -0.6085 * y + 270.42
+    return X, Y
 
 
 # ================= 状态管理 (线程安全) =================
@@ -282,7 +329,7 @@ def generate_frames():
 
 
 def _process_detections(frame, results):
-    """处理检测结果： 仅绘制彩色框 + 更新统计 (无中文)"""
+    """处理检测结果： 仅在识别模式下绘制彩色框 + 更新统计"""
     if not results:
         return
         
@@ -296,13 +343,12 @@ def _process_detections(frame, results):
         if not front_class:
             continue
         
-        # 绘制检测框 (仅彩色框，无中文标签)
-        x1, y1 = int(bbox.get("x1", 0)), int(bbox.get("y1", 0))
-        x2, y2 = int(bbox.get("x2", 0)), int(bbox.get("y2", 0))
-        color = PEPPER_COLORS.get(front_class, (255, 255, 255))
-        
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-        # 不绘制任何中文文本，彻底解决乱码问题
+        # 仅在识别模式下绘制检测框
+        if state.is_recognizing:
+            x1, y1 = int(bbox.get("x1", 0)), int(bbox.get("y1", 0))
+            x2, y2 = int(bbox.get("x2", 0)), int(bbox.get("y2", 0))
+            color = PEPPER_COLORS.get(front_class, (255, 255, 255))
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
         
         # 更新统计 (线程安全)
         with state.lock:
@@ -337,6 +383,172 @@ def _add_minimal_overlay(frame):
                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
 
+
+
+def sorting_thread():
+    """分拣执行线程：获取第一个识别结果并模拟机械臂抓取动作"""
+    logger.info("🤖 分拣线程 [sorting_thread] 已启动，等待识别结果...")
+    
+    try:
+        while not shutdown_event.is_set() and state.is_sorting:
+            # 机械臂抓取动作
+            try:
+                if robot_arm and robot_arm.is_connected:
+                    # 1. 移动到抓取位置 (使用抓取姿态)
+                    logger.info(f"🔧 移动到抓取位置: X={arm_x:.2f}, Y={arm_y:.2f}")
+                    success = robot_arm.move_xyzt_goal(
+                        x=arm_x, y=arm_y, 
+                        z=GRIP_POSE["z"], t=GRIP_POSE["t"], 
+                        r=GRIP_POSE["r"], g=GRIP_POSE["g"]
+                    )
+            except Exception as e:
+                logger.error(f"❌ 机械臂控制异常: {e}")
+                continue
+            
+            result = detector_mgr.get_latest_result(timeout=0.5)
+            if result is None or not result.get("results"):
+                continue
+                
+            frame, results, fps = result["frame"], result["results"], result["fps"]
+            first_det = results[0]
+            class_name = first_det.get("class_name", "")
+            confidence = first_det.get("confidence", 0.0)
+            bbox = first_det.get("bbox", {})
+            
+            front_class = CLASS_MAPPING.get(class_name)
+            if not front_class and class_name in CLASS_MAPPING.values():
+                front_class = class_name
+            if not front_class:
+                for orig, mapped in CLASS_MAPPING.items():
+                    if class_name in orig or orig in class_name:
+                        front_class = mapped
+                        break
+            
+            if not front_class or front_class not in PEPPER_COLORS:
+                logger.warning(f"⚠️ 无法识别的类别: '{class_name}'")
+                with state.lock:
+                    state.error_count += 1
+                continue
+            
+            # 提取坐标
+            if isinstance(bbox, list) and len(bbox) >= 4:
+                x1, y1, x2, y2 = bbox[0], bbox[1], bbox[2], bbox[3]
+            else:
+                # 如果是字典格式（兼容旧格式）
+                x1, y1 = int(bbox.get("x1", 0)), int(bbox.get("y1", 0))
+                x2, y2 = int(bbox.get("x2", 0)), int(bbox.get("y2", 0))
+            center_x, center_y = (x1 + x2) // 2, (y1 + y2) // 2
+            
+            logger.info(f"🎯 目标: {front_class} | 置信度: {confidence:.2f} | 像素坐标: ({center_x}, {center_y})")
+            
+            # 坐标转换：像素 -> 机械臂坐标
+            arm_x, arm_y = convert_yolo_to_arm(center_x, center_y)
+            logger.info(f"🔄 转换后机械臂坐标: ({arm_x:.2f}, {arm_y:.2f})")
+            
+            # 获取放置位置
+            place_pos = PLACING_POSITIONS.get(front_class)
+            if not place_pos:
+                logger.error(f"❌ 未定义 {front_class} 的放置位置")
+                continue
+            
+            # 机械臂抓取动作
+            try:
+                if robot_arm and robot_arm.is_connected:
+                    logger.info("🤖 开始机械臂抓取流程...")
+                    
+                    # 1. 移动到抓取位置 (使用抓取姿态)
+                    logger.info(f"🔧 移动到抓取位置: X={arm_x:.2f}, Y={arm_y:.2f}")
+                    success = robot_arm.move_xyzt_goal(
+                        x=arm_x, y=arm_y, 
+                        z=GRIP_POSE["z"], t=GRIP_POSE["t"], 
+                        r=GRIP_POSE["r"], g=GRIP_POSE["g"]
+                    )
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
+                    
+                    # 2. 闭合夹爪 (模拟)
+                    logger.info("🔧 闭合夹爪")
+                    # 这里可以添加夹爪控制，如果有的话
+                    time.sleep(0.5)
+                    
+                    # 3. 抬起物品 (移动到安全高度)
+                    logger.info("🔧 抬起物品")
+                    success = robot_arm.move_xyzt_goal(
+                        x=arm_x, y=arm_y, 
+                        z=INITIAL_POSE["z"], t=INITIAL_POSE["t"], 
+                        r=INITIAL_POSE["r"], g=INITIAL_POSE["g"]
+                    )
+                    if not success:
+                        logger.error("❌ 抬起物品失败")
+                        continue
+                    time.sleep(2)
+                    
+                    # 4. 移动到放置位置
+                    logger.info(f"🔧 移动到放置位置: X={place_pos['x']:.2f}, Y={place_pos['y']:.2f}")
+                    success = robot_arm.move_xyzt_goal(
+                        x=place_pos["x"], y=place_pos["y"], 
+                        z=INITIAL_POSE["z"], t=INITIAL_POSE["t"], 
+                        r=INITIAL_POSE["r"], g=INITIAL_POSE["g"]
+                    )
+                    if not success:
+                        logger.error("❌ 移动到放置位置失败")
+                        continue
+                    time.sleep(2)
+                    
+                    # 5. 释放物品 (张开夹爪)
+                    logger.info("🔧 释放物品")
+                    # 这里可以添加夹爪控制
+                    time.sleep(0.5)
+                    
+                    logger.info(f"✅ 分拣完成: {front_class} -> ({place_pos['x']:.2f}, {place_pos['y']:.2f})")
+                else:
+                    logger.warning("⚠️ 机械臂未连接，使用模拟动作")
+                    # 模拟动作
+                    for action in [
+                        f"移动到 ({arm_x:.2f}, {arm_y:.2f})",
+                        "下降至抓取高度",
+                        f"闭合夹爪，抓取 [{front_class}]",
+                        "抬起物品",
+                        f"移动至分拣区 ({place_pos['x']:.2f}, {place_pos['y']:.2f})",
+                        "释放物品 ✓"
+                    ]:
+                        logger.info(f"🔧 机械臂: {action}")
+                        time.sleep(0.2)
+            
+            except Exception as e:
+                logger.error(f"❌ 机械臂控制异常: {e}")
+                continue
+            
+            # 更新统计（线程安全）
+            with state.lock:
+                state.counts[front_class] += 1
+                state.total_processed += 1
+                if confidence >= 0.9:
+                    state.conf_stats["high"] += 1
+                elif confidence >= 0.7:
+                    state.conf_stats["medium"] += 1
+                else:
+                    state.conf_stats["low"] += 1
+                state.conf_stats["total"] += 1
+                state.recent_detections.appendleft({
+                    "class": front_class,
+                    "confidence": round(confidence, 3),
+                    "timestamp": time.time()
+                })
+            
+            logger.info(f"📊 统计: {front_class}+1 | 总计: {state.total_processed}")
+            break  # 单次分拣完成，如需连续请注释此行
+            
+    except Exception as e:
+        logger.error(f"❌ 分拣线程异常: {e}", exc_info=True)
+        with state.lock:
+            state.error_count += 1
+    finally:
+        logger.info("🏁 分拣线程执行完毕")
+
+
 # ================= 后台资源监控线程 =================
 def monitor_resources():
     """每 2 秒采集系统资源"""
@@ -358,7 +570,7 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-    """ 支持真正暂停的视频流端点"""
+    """ 支持暂停的视频流端点"""
     return Response(
         generate_frames(),
         mimetype='multipart/x-mixed-replace; boundary=frame'
@@ -410,6 +622,28 @@ def stop_recognition():
     return jsonify({"success": True, "message": "识别模块已停止"})
 
 
+@app.route('/api/emergency/stop', methods=['POST'])
+@require_auth
+def emergency_stop():
+    """ 急停功能：关闭扭矩锁"""
+    global robot_arm
+    if robot_arm and robot_arm.is_connected:
+        success = robot_arm.torque_control(0)  # 关闭扭矩锁
+        if success:
+            # 同时停止所有操作
+            with state.lock:
+                state.is_recognizing = False
+                state.is_sorting = False
+            logger.info("🚨 急停激活：已关闭扭矩锁并停止所有操作")
+            return jsonify({"success": True, "message": "急停成功，已关闭扭矩锁"})
+        else:
+            logger.error("❌ 急停失败：无法关闭扭矩锁")
+            return jsonify({"success": False, "message": "急停失败，无法关闭扭矩锁"})
+    else:
+        logger.warning("⚠️ 急停请求：机械臂未连接")
+        return jsonify({"success": False, "message": "机械臂未连接"})
+
+
 @app.route('/api/sorting/start', methods=['POST'])
 @require_auth
 def start_sorting():
@@ -419,22 +653,34 @@ def start_sorting():
         if state.is_sorting:
             return jsonify({"success": False, "message": "分拣已在运行"})
         state.is_sorting = True
-        state.start_time = time.time()
+        if not state.start_time:  # 避免重复重置开始时间
+            state.start_time = time.time()
     
     if not detector_mgr.is_ready():
         detector_mgr.start()
     
-    logger.info(f" 分拣执行已启动 | 参数: {data}")
-    return jsonify({"success": True, "message": "分拣执行已启动"})
-
+    # 🚀 启动分拣执行线程（守护线程，主程序退出时自动清理）
+    sorting_proc = threading.Thread(
+        target=sorting_thread, 
+        daemon=True, 
+        name="SortingThread"
+    )
+    sorting_proc.start()
+    
+    logger.info(f"⚙️ 分拣执行已启动 | 参数: {data}")
+    return jsonify({"success": True, "message": "分拣执行已启动", "thread": "sorting_thread"})
 
 @app.route('/api/sorting/stop', methods=['POST'])
 @require_auth
 def stop_sorting():
     """停止分拣执行"""
     with state.lock:
-        state.is_sorting = False
-    logger.info("[INFO] 分拣执行已停止")
+        if not state.is_sorting:
+            return jsonify({"success": False, "message": "分拣未在运行"})
+        state.is_sorting = False  # 线程会检测此标志退出
+    
+    logger.info("[INFO] 分拣执行已停止，等待线程退出...")
+    # 如需等待线程完全退出，可在此添加 threading.enumerate() 检查
     return jsonify({"success": True, "message": "分拣执行已停止"})
 
 
@@ -531,7 +777,20 @@ if __name__ == '__main__':
         logger.info("🔧 预启动 YOLODetector...")
         detector_mgr.start()
         
-        # 3. 启动 Flask
+        # 3. 初始化机械臂控制器
+        try:
+            logger.info("🤖 初始化机械臂控制器...")
+            robot_arm = RobotArmController(port="/dev/ttyUSB0")  # 根据实际端口调整
+            robot_arm.connect()
+            if robot_arm.is_connected:
+                logger.info("✅ 机械臂控制器已连接")
+            else:
+                logger.warning("⚠️ 机械臂控制器连接失败，将使用模拟模式")
+        except Exception as e:
+            logger.error(f"❌ 机械臂控制器初始化失败: {e}")
+            robot_arm = None
+        
+        # 4. 启动 Flask
         logger.info("🌶️ 辣椒分拣统计系统 后端已启动")
         logger.info(f"📡 服务地址: http://127.0.0.1:{PORT}")
         logger.info(f"🔐 鉴权密钥: {AUTH_KEY}")
@@ -549,6 +808,10 @@ if __name__ == '__main__':
         logger.info("正在清理资源...")
         shutdown_event.set()
         detector_mgr.stop()
+        
+        # 断开机械臂
+        if robot_arm:
+            robot_arm.disconnect()
         
         # 等待线程退出
         if 'monitor_thread' in locals() and monitor_thread.is_alive():
