@@ -463,7 +463,28 @@ class RoArmM3S:
         """复位到初始位置"""
         cmd = {"T": CommandCode.MOVE_INIT}
         return self._send_command(cmd, timeout=timeout) is not None
-    
+
+    def torque_control(self, cmd: int, max_retries: int = 1) -> bool:
+        """TORQUE CTRL - 扭矩锁控制 (T:210)"""
+        if cmd not in (0, 1):
+            raise ValueError("cmd must be 0 (off) or 1 (on)")
+        payload = {
+            "T": CommandCode.TORQUE_CTRL,
+            "cmd": cmd
+        }
+        # 该指令一般不会返回详细状态，直接发送即可
+        for attempt in range(max_retries):
+            try:
+                result = self._send_command(payload, wait_response=False)
+                if result is None:
+                    # 非阻塞 send，返回 None 视为成功
+                    return True
+            except RuntimeError:
+                pass
+            if attempt < max_retries - 1:
+                time.sleep(0.1)
+        return False
+
     def move_joints_angle(self, b: float = 0, s: float = 0, e: float = 90,
                           t: float = 0, r: float = 0, h: float = 180,
                           spd: float = 0, acc: float = 0, blocking: bool = True) -> bool:
@@ -560,3 +581,30 @@ class RoArmM3S:
     
     def __del__(self):
         self.disconnect()
+
+
+if __name__ == "__main__":
+    # 简单使用示例：调用 move_to_xyz 的全部参数
+    # sym:move_to_xyz
+    port = "/dev/ttyUSB0"
+    with RoArmM3S(port=port, baudrate=115200, timeout=1.0) as arm:
+        if not arm.ser or not arm.ser.is_open:
+            print("✗ 串口未连接，请检查端口")
+        else:
+            print("✓ 连接成功，执行 move_to_xyz 示例")
+            success = arm.move_to_xyz(
+                x=200.0,
+                y=0.0,
+                z=150.0,
+                pitch=0.0,
+                roll=0.0,
+                gripper=3.14,
+                spd=0.25,
+                blocking=False
+            )
+            print(f"move_to_xyz 执行结果: {success}")
+
+            # 等待一段时间以读取反馈状态
+            time.sleep(1.0)
+            state = arm.get_current_position(timeout=1.0)
+            print(f"当前状态: {state}")
