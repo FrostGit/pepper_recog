@@ -148,9 +148,9 @@ class YOLODetector:
                 fps_start_time = time.time()
                 fps_frame_count = 0
             
-            # 在画面上写入 FPS (仅用于返回的画面，不影响逻辑)
-            cv2.putText(annotated_frame, f"FPS: {self.fps:.1f}", (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            # # 在画面上写入 FPS (仅用于返回的画面，不影响逻辑)
+            # cv2.putText(annotated_frame, f"FPS: {self.fps:.1f}", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             # 4. 将结果放入队列 (非阻塞，如果队列满则丢弃旧帧，保证实时性)
             try:

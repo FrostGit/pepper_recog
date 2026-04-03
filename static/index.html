@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,9 +21,9 @@
             --color-warning: #f59e0b;
             --color-error: #ef4444;
             --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --pepper-millet_dr: #dc2626;
             --pepper-millet_fr: #f97316;
             --pepper-millet_fg: #22c55e;
@@ -30,10 +31,14 @@
             --pepper-zunyi_l: #8b5cf6;
             --pepper-zunyi_s: #a78bfa;
         }
-        
+
         /* 全局样式 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
             background-color: var(--bg-primary);
@@ -44,7 +49,7 @@
             line-height: 1.5;
             transition: background-color 0.3s, color 0.3s;
         }
-        
+
         .container {
             width: 100%;
             height: 100%;
@@ -54,7 +59,7 @@
             gap: 14px;
             padding: 14px;
         }
-        
+
         /* 头部样式 */
         .header {
             grid-column: 1 / -1;
@@ -65,9 +70,9 @@
             border-radius: 14px;
             padding: 0 24px;
             box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .header h1 {
             font-size: 24px;
             color: #ffffff;
@@ -77,20 +82,20 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .header-right {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-        
+
         /* 主题切换按钮 */
         .theme-toggle-btn {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
             color: #ffffff;
             font-size: 18px;
             cursor: pointer;
@@ -100,17 +105,17 @@
             transition: all 0.3s;
             backdrop-filter: blur(4px);
         }
-        
+
         .theme-toggle-btn:hover {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
             transform: rotate(15deg) scale(1.05);
         }
-        
+
         .status-btn {
             padding: 9px 18px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             color: #ffffff;
             cursor: pointer;
             transition: all 0.25s;
@@ -121,37 +126,59 @@
             align-items: center;
             gap: 6px;
         }
-        
+
         .status-btn:hover:not(:disabled) {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
-        
+
         .status-btn.online {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
             border-color: var(--color-success);
-            box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
         }
-        
-        .status-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        
+
+        .status-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .status-btn.loading {
-            opacity: 0.85; cursor: not-allowed; position: relative; padding-right: 32px;
+            opacity: 0.85;
+            cursor: not-allowed;
+            position: relative;
+            padding-right: 32px;
         }
+
         .status-btn.loading::after {
-            content: ''; position: absolute; width: 14px; height: 14px;
-            border: 2px solid transparent; border-top-color: #ffffff;
-            border-radius: 50%; animation: spin 0.8s linear infinite;
-            right: 10px; top: 50%; transform: translateY(-50%);
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
         }
-        
-        @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
-        
+
+        @keyframes spin {
+            to {
+                transform: translateY(-50%) rotate(360deg);
+            }
+        }
+
         .time-display {
-            font-size: 15px; color: rgba(255,255,255,0.95); font-weight: 500;
-            min-width: 75px; text-align: right; font-family: monospace;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            min-width: 75px;
+            text-align: right;
+            font-family: monospace;
         }
-        
+
         /* 通用面板样式 */
         .panel-card {
             background: var(--bg-card);
@@ -163,7 +190,7 @@
             flex-direction: column;
             transition: background-color 0.3s, border-color 0.3s;
         }
-        
+
         .panel-title {
             font-size: 15px;
             font-weight: 600;
@@ -176,7 +203,7 @@
             border-bottom: 2px solid var(--border-color);
             transition: color 0.3s, border-color 0.3s;
         }
-        
+
         /* 左侧面板 */
         .left-panel {
             display: flex;
@@ -185,16 +212,23 @@
             overflow-y: auto;
             padding-right: 2px;
         }
-        .left-panel::-webkit-scrollbar { width: 5px; }
-        .left-panel::-webkit-scrollbar-thumb { background: var(--color-primary-light); border-radius: 3px; }
-        
+
+        .left-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .left-panel::-webkit-scrollbar-thumb {
+            background: var(--color-primary-light);
+            border-radius: 3px;
+        }
+
         /* 系统状态指标 (优化为横向) */
         .device-stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
         }
-        
+
         .stat-item {
             text-align: center;
             padding: 10px 4px;
@@ -203,9 +237,11 @@
             border: 1px solid var(--border-color);
             transition: transform 0.2s, background-color 0.3s, border-color 0.3s;
         }
-        
-        .stat-item:hover { transform: translateY(-2px); }
-        
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+        }
+
         .stat-value {
             font-size: 18px;
             font-weight: 700;
@@ -214,137 +250,435 @@
             font-family: monospace;
             transition: color 0.3s;
         }
-        
+
         .stat-label {
             font-size: 10px;
             color: var(--text-secondary);
             font-weight: 500;
             transition: color 0.3s;
         }
-        
+
         /* 信号条 */
-        .signal-bars { display: flex; align-items: flex-end; gap: 3px; height: 18px; }
-        .signal-bar { width: 4px; background: var(--border-color); border-radius: 2px; transition: all 0.3s; }
-        .signal-bar:nth-child(1) { height: 25%; } .signal-bar:nth-child(2) { height: 50%; }
-        .signal-bar:nth-child(3) { height: 75%; } .signal-bar:nth-child(4) { height: 100%; }
-        .signal-bar.active { background: var(--color-success); }
-        .signal-bar.active-yellow { background: var(--color-warning); }
-        .signal-bar.active-red { background: var(--color-error); }
-        .signal-bar.inactive { background: var(--border-color); opacity: 0.4; }
-        
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 18px;
+        }
+
+        .signal-bar {
+            width: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .signal-bar:nth-child(1) {
+            height: 25%;
+        }
+
+        .signal-bar:nth-child(2) {
+            height: 50%;
+        }
+
+        .signal-bar:nth-child(3) {
+            height: 75%;
+        }
+
+        .signal-bar:nth-child(4) {
+            height: 100%;
+        }
+
+        .signal-bar.active {
+            background: var(--color-success);
+        }
+
+        .signal-bar.active-yellow {
+            background: var(--color-warning);
+        }
+
+        .signal-bar.active-red {
+            background: var(--color-error);
+        }
+
+        .signal-bar.inactive {
+            background: var(--border-color);
+            opacity: 0.4;
+        }
+
         /* 效率统计网格 */
-        .efficiency-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+        .efficiency-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .efficiency-item {
-            text-align: center; padding: 12px 8px;
-            background: var(--bg-card-alt); border-radius: 10px;
-            border: 1px solid var(--border-color); transition: all 0.2s;
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
         }
-        .efficiency-item:hover { transform: translateY(-2px); border-color: var(--color-primary-light); }
-        
+
+        .efficiency-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-primary-light);
+        }
+
         .efficiency-value {
-            font-size: 18px; color: var(--color-primary); font-weight: 700; margin-bottom: 2px; font-family: monospace;
+            font-size: 18px;
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 2px;
+            font-family: monospace;
         }
-        .efficiency-label { font-size: 11px; color: var(--text-secondary); }
-        
+
+        .efficiency-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
         /* 进度条组件 */
-        .progress-container { margin-top: 12px; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
-        .progress-bar { height: 8px; background: var(--bg-card-alt); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
-            border-radius: 4px; transition: width 0.5s ease; position: relative;
+        .progress-container {
+            margin-top: 12px;
         }
-        .progress-fill::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
         }
-        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        
-        /* 中央视频区域 */
-        .video-container {
-            grid-row: 2 / 3; grid-column: 2 / 3;
-            background: var(--bg-card); border-radius: 14px; padding: 16px;
-            box-shadow: var(--shadow-md); border: 1px solid var(--border-color);
-            display: flex; flex-direction: column; overflow: hidden;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        
-        .video-header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 10px; }
-        .video-title { font-size: 14px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-        .video-status { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); animation: pulse-dot 2s infinite; }
-        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(0.9); } }
-        .video-status.recording .status-dot { background: var(--color-error); }
-        .video-status.paused .status-dot { background: var(--color-warning); }
-        
-        .video-main {
-            flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
-            background: #0f172a; border-radius: 10px; overflow: hidden; border: 2px solid var(--border-color); min-height: 0;
-        }
-        .video-main img { width: 100%; height: 100%; object-fit: contain; display: block; }
-        
-        #detectionOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-        .detection-box {
-            position: absolute; border: 2px solid var(--color-success); border-radius: 6px;
-            animation: pulse-box 1.5s infinite; background: rgba(34, 197, 94, 0.08);
-        }
-        .detection-box::after {
-            content: attr(data-label); position: absolute; top: -28px; left: -2px;
-            background: var(--color-success); color: white; padding: 4px 12px; border-radius: 5px;
-            font-size: 11px; font-weight: 600; white-space: nowrap; box-shadow: var(--shadow-sm);
-        }
-        @keyframes pulse-box { 0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3); } 50% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); } }
-        
-        .video-controls {
-            display: flex; justify-content: center; align-items: center; gap: 12px;
-            padding: 10px 0 0; border-top: 1px solid var(--border-color); margin-top: 10px;
-        }
-        .control-btn {
-            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color);
-            background: var(--bg-card-alt); color: var(--text-primary); font-size: 14px; cursor: pointer;
-            transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-        }
-        .control-btn:hover { background: var(--color-primary); color: white; border-color: var(--color-primary); transform: scale(1.05); }
-        
-        /* 右侧面板 */
-        .right-panel {
-            display: flex; flex-direction: column; gap: 14px;
-            overflow-y: auto; padding-left: 2px; min-height: 0; /* 关键：允许子元素收缩 */
-        }
-        .right-panel::-webkit-scrollbar { width: 5px; }
-        .right-panel::-webkit-scrollbar-thumb { background: var(--color-primary-light); border-radius: 3px; }
-        
-        /* 辣椒分类网格 */
-        .pepper-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-        .pepper-item {
-            padding: 12px 10px; background: var(--bg-card-alt); border-radius: 10px;
-            border-left: 4px solid var(--color-primary); transition: all 0.25s; cursor: pointer;
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-card-alt);
+            border-radius: 4px;
+            overflow: hidden;
             border: 1px solid var(--border-color);
         }
-        .pepper-item:hover { background: white; transform: translateX(3px); border-color: var(--color-primary-light); }
-        .pepper-item.millet_dr { border-left-color: var(--pepper-millet_dr); }
-        .pepper-item.millet_fr { border-left-color: var(--pepper-millet_fr); }
-        .pepper-item.millet_fg { border-left-color: var(--pepper-millet_fg); }
-        .pepper-item.lantern { border-left-color: var(--pepper-lantern); }
-        .pepper-item.zunyi_l { border-left-color: var(--pepper-zunyi_l); }
-        .pepper-item.zunyi_s { border-left-color: var(--pepper-zunyi_s); }
-        
-        .pepper-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .pepper-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-        .pepper-class { font-size: 9px; color: var(--text-secondary); background: rgba(0,0,0,0.06); padding: 1px 6px; border-radius: 3px; font-family: monospace; }
-        .pepper-count { font-size: 20px; font-weight: 700; color: var(--color-primary); text-align: right; font-family: monospace; line-height: 1; }
-        .pepper-rate { font-size: 10px; color: var(--color-success); text-align: right; margin-top: 2px; font-weight: 600; }
-        
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* 中央视频区域 */
+        .video-container {
+            grid-row: 2 / 3;
+            grid-column: 2 / 3;
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .video-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .video-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-success);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(0.9);
+            }
+        }
+
+        .video-status.recording .status-dot {
+            background: var(--color-error);
+        }
+
+        .video-status.paused .status-dot {
+            background: var(--color-warning);
+        }
+
+        .video-main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            min-height: 0;
+        }
+
+        .video-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #detectionOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .detection-box {
+            position: absolute;
+            border: 2px solid var(--color-success);
+            border-radius: 6px;
+            animation: pulse-box 1.5s infinite;
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .detection-box::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -28px;
+            left: -2px;
+            background: var(--color-success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes pulse-box {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 0 12px rgba(34, 197, 94, 0);
+            }
+        }
+
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card-alt);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            transform: scale(1.05);
+        }
+
+        /* 右侧面板 */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            padding-left: 2px;
+            min-height: 0;
+            /* 关键：允许子元素收缩 */
+        }
+
+        .right-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb {
+            background: var(--color-primary-light);
+            border-radius: 3px;
+        }
+
+        /* 辣椒分类网格 */
+        .pepper-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .pepper-item {
+            padding: 12px 10px;
+            background: var(--bg-card-alt);
+            border-radius: 10px;
+            border-left: 4px solid var(--color-primary);
+            transition: all 0.25s;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .pepper-item:hover {
+            background: white;
+            transform: translateX(3px);
+            border-color: var(--color-primary-light);
+        }
+
+        .pepper-item.millet_dr {
+            border-left-color: var(--pepper-millet_dr);
+        }
+
+        .pepper-item.millet_fr {
+            border-left-color: var(--pepper-millet_fr);
+        }
+
+        .pepper-item.millet_fg {
+            border-left-color: var(--pepper-millet_fg);
+        }
+
+        .pepper-item.lantern {
+            border-left-color: var(--pepper-lantern);
+        }
+
+        .pepper-item.zunyi_l {
+            border-left-color: var(--pepper-zunyi_l);
+        }
+
+        .pepper-item.zunyi_s {
+            border-left-color: var(--pepper-zunyi_s);
+        }
+
+        .pepper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .pepper-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pepper-class {
+            font-size: 9px;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.06);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .pepper-count {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-align: right;
+            font-family: monospace;
+            line-height: 1;
+        }
+
+        .pepper-rate {
+            font-size: 10px;
+            color: var(--color-success);
+            text-align: right;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
         /* 实时日志 (修复布局遮挡) */
         .log-card {
-            flex: 1; /* 占据剩余所有空间 */
-            min-height: 0; /* 允许 flex 子元素收缩 */
-            display: flex; flex-direction: column;
+            flex: 1;
+            /* 占据剩余所有空间 */
+            min-height: 0;
+            /* 允许 flex 子元素收缩 */
+            display: flex;
+            flex-direction: column;
         }
-        
+
         .log-container {
-            flex: 1; /* 内容区域填充卡片剩余空间 */
+            flex: 1;
+            /* 内容区域填充卡片剩余空间 */
             overflow-y: auto;
             font-size: 11px;
             color: var(--text-secondary);
@@ -355,15 +689,44 @@
             border: 1px solid var(--border-color);
             line-height: 1.5;
         }
-        .log-container::-webkit-scrollbar { width: 4px; }
-        .log-container::-webkit-scrollbar-thumb { background: var(--color-primary-light); border-radius: 2px; }
-        .log-item { padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.06); display: flex; gap: 6px; }
-        .log-item:last-child { border-bottom: none; }
-        .log-item .time { color: var(--text-secondary); min-width: 48px; }
-        .log-item.success { color: var(--color-success); }
-        .log-item.error { color: var(--color-error); }
-        .log-item.warning { color: var(--color-warning); }
-        
+
+        .log-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb {
+            background: var(--color-primary-light);
+            border-radius: 2px;
+        }
+
+        .log-item {
+            padding: 3px 0;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 6px;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-item .time {
+            color: var(--text-secondary);
+            min-width: 48px;
+        }
+
+        .log-item.success {
+            color: var(--color-success);
+        }
+
+        .log-item.error {
+            color: var(--color-error);
+        }
+
+        .log-item.warning {
+            color: var(--color-warning);
+        }
+
         /* 底部统计面板 */
         .bottom-panel {
             grid-column: 1 / -1;
@@ -371,53 +734,181 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
         }
+
         .stat-card {
-            background: var(--bg-card); border-radius: 14px; padding: 14px 16px;
-            box-shadow: var(--shadow-md); border: 1px solid var(--border-color);
-            text-align: center; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--color-primary-light); }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-primary-light);
+        }
+
         .stat-icon {
-            width: 40px; height: 40px; margin-bottom: 8px;
+            width: 40px;
+            height: 40px;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-            border-radius: 10px; display: flex; justify-content: center; align-items: center;
-            font-size: 18px; color: white; box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
         }
-        .stat-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
-        .stat-card-value { font-size: 22px; font-weight: 700; color: var(--color-primary); font-family: monospace; }
-        
+
+        .stat-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-card-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-primary);
+            font-family: monospace;
+        }
+
         /* 通知样式 */
         .notification {
-            position: fixed; top: 20px; right: 20px; padding: 12px 18px;
-            border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 1000;
-            animation: slideIn 0.3s ease; box-shadow: var(--shadow-lg); border: 1px solid;
-            display: flex; align-items: center; gap: 8px; max-width: 280px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 280px;
         }
-        .notification::before { font-size: 16px; font-weight: bold; }
-        .notification.success { background: white; border-color: var(--color-success); color: var(--color-primary-dark); }
-        .notification.success::before { content: '✓'; color: var(--color-success); }
-        .notification.error { background: white; border-color: var(--color-error); color: #991b1b; }
-        .notification.error::before { content: '✕'; color: var(--color-error); }
-        .notification.info { background: white; border-color: var(--color-info); color: #1e40af; }
-        .notification.info::before { content: 'ℹ'; color: var(--color-info); }
-        
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-        
+
+        .notification::before {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .notification.success {
+            background: white;
+            border-color: var(--color-success);
+            color: var(--color-primary-dark);
+        }
+
+        .notification.success::before {
+            content: '✓';
+            color: var(--color-success);
+        }
+
+        .notification.error {
+            background: white;
+            border-color: var(--color-error);
+            color: #991b1b;
+        }
+
+        .notification.error::before {
+            content: '✕';
+            color: var(--color-error);
+        }
+
+        .notification.info {
+            background: white;
+            border-color: var(--color-info);
+            color: #1e40af;
+        }
+
+        .notification.info::before {
+            content: 'ℹ';
+            color: var(--color-info);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
         /* 响应式适配 */
         @media (max-width: 1600px) {
-            .container { grid-template-columns: 280px 1fr 320px; gap: 10px; padding: 10px; }
-            .stat-value { font-size: 16px; } .stat-label { font-size: 9px; }
+            .container {
+                grid-template-columns: 280px 1fr 320px;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .stat-value {
+                font-size: 16px;
+            }
+
+            .stat-label {
+                font-size: 9px;
+            }
         }
-        
+
         @media (max-width: 1200px) {
-            .container { grid-template-columns: 1fr; grid-template-rows: 64px auto 1fr 120px; }
-            .left-panel, .right-panel { flex-direction: row; overflow-x: auto; padding: 0; min-height: auto; }
-            .panel-card { min-width: 260px; margin: 0 5px; }
-            .video-container { grid-row: 3; grid-column: 1; min-height: 300px; }
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 64px auto 1fr 120px;
+            }
+
+            .left-panel,
+            .right-panel {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 0;
+                min-height: auto;
+            }
+
+            .panel-card {
+                min-width: 260px;
+                margin: 0 5px;
+            }
+
+            .video-container {
+                grid-row: 3;
+                grid-column: 1;
+                min-height: 300px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- 头部 -->
@@ -432,7 +923,7 @@
                 <div class="time-display" id="timeDisplay">09:01:24</div>
             </div>
         </div>
-        
+
         <!-- 左侧面板 -->
         <div class="left-panel">
             <!-- 系统状态 (优化：去掉 GPU，指标一排) -->
@@ -461,7 +952,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- 分拣效率 -->
             <div class="panel-card">
                 <div class="panel-title">📈 分拣效率</div>
@@ -483,7 +974,7 @@
                         <div class="efficiency-label">误判</div>
                     </div>
                 </div>
-                
+
                 <div class="progress-container">
                     <div class="progress-label">
                         <span>🎯 任务进度</span>
@@ -495,7 +986,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- 中央视频区域 -->
         <div class="video-container">
             <div class="video-header">
@@ -505,28 +996,29 @@
                     <span>识别中</span>
                 </div>
             </div>
-            
+
             <div class="video-main">
                 <img src="/video_feed" alt="等待视频流..." id="videoFeed">
                 <div id="detectionOverlay"></div>
             </div>
-            
+
             <div class="video-controls">
                 <button class="control-btn" title="截图" onclick="captureFrame()">📷</button>
                 <button class="control-btn active" title="暂停/继续" id="togglePlayBtn" onclick="toggleVideo()">⏸️</button>
                 <button class="control-btn" title="全屏" onclick="toggleFullscreen()">⛶</button>
             </div>
         </div>
-        
+
         <!-- 右侧面板 (修复：日志自动填充，移除最近识别) -->
         <div class="right-panel">
             <!-- 辣椒分类统计 -->
             <div class="panel-card">
                 <div class="panel-title">
                     <span>🌶️ 分类统计</span>
-                    <span style="font-size: 12px; color: var(--text-secondary); cursor: pointer;" onclick="resetCounts()">↺ 重置</span>
+                    <span style="font-size: 12px; color: var(--text-secondary); cursor: pointer;"
+                        onclick="resetCounts()">↺ 重置</span>
                 </div>
-                
+
                 <div class="pepper-grid">
                     <div class="pepper-item millet_dr" data-class="millet_dr" onclick="filterByClass('millet_dr')">
                         <div class="pepper-header">
@@ -536,7 +1028,7 @@
                         <div class="pepper-count" id="count_millet_dr">0</div>
                         <div class="pepper-rate" id="rate_millet_dr">0.0%</div>
                     </div>
-                    
+
                     <div class="pepper-item millet_fr" data-class="millet_fr" onclick="filterByClass('millet_fr')">
                         <div class="pepper-header">
                             <span class="pepper-name">鲜红小米辣</span>
@@ -545,7 +1037,7 @@
                         <div class="pepper-count" id="count_millet_fr">0</div>
                         <div class="pepper-rate" id="rate_millet_fr">0.0%</div>
                     </div>
-                    
+
                     <div class="pepper-item millet_fg" data-class="millet_fg" onclick="filterByClass('millet_fg')">
                         <div class="pepper-header">
                             <span class="pepper-name">鲜青小米辣</span>
@@ -554,7 +1046,7 @@
                         <div class="pepper-count" id="count_millet_fg">0</div>
                         <div class="pepper-rate" id="rate_millet_fg">0.0%</div>
                     </div>
-                    
+
                     <div class="pepper-item lantern" data-class="lantern" onclick="filterByClass('lantern')">
                         <div class="pepper-header">
                             <span class="pepper-name">圆形灯笼椒</span>
@@ -563,7 +1055,7 @@
                         <div class="pepper-count" id="count_lantern">0</div>
                         <div class="pepper-rate" id="rate_lantern">0.0%</div>
                     </div>
-                    
+
                     <div class="pepper-item zunyi_l" data-class="zunyi_l" onclick="filterByClass('zunyi_l')">
                         <div class="pepper-header">
                             <span class="pepper-name">大号遵义椒</span>
@@ -572,7 +1064,7 @@
                         <div class="pepper-count" id="count_zunyi_l">0</div>
                         <div class="pepper-rate" id="rate_zunyi_l">0.0%</div>
                     </div>
-                    
+
                     <div class="pepper-item zunyi_s" data-class="zunyi_s" onclick="filterByClass('zunyi_s')">
                         <div class="pepper-header">
                             <span class="pepper-name">小号遵义椒</span>
@@ -582,7 +1074,7 @@
                         <div class="pepper-rate" id="rate_zunyi_s">0.0%</div>
                     </div>
                 </div>
-                
+
                 <div class="progress-container" style="margin-top: 12px;">
                     <div class="progress-label">
                         <span>📦 分拣队列</span>
@@ -593,7 +1085,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- 实时日志 (占据右侧剩余所有空间，不再被遮挡) -->
             <div class="panel-card log-card">
                 <div class="panel-title">📋 实时日志</div>
@@ -603,7 +1095,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- 底部统计面板 -->
         <div class="bottom-panel">
             <div class="stat-card">
@@ -655,30 +1147,32 @@
                 }`
             }
         };
-        
+
         // ========== 业务逻辑 ==========
+        // ========== 业务逻辑 (替换原文件中的对应部分) ==========
         const API_BASE_URL = '/api';
         const AUTH_KEY = "Tianjin HuaDa Tech";
-        
+
         const PEPPER_CLASSES = {
             millet_dr: { name: '干红小米辣', color: '#dc2626' },
             millet_fr: { name: '鲜红小米辣', color: '#f97316' },
             millet_fg: { name: '鲜青小米辣', color: '#22c55e' },
-            lantern:   { name: '圆形灯笼椒', color: '#eab308' },
-            zunyi_l:   { name: '大号遵义椒', color: '#8b5cf6' },
-            zunyi_s:   { name: '小号遵义椒', color: '#a78bfa' }
+            lantern: { name: '圆形灯笼椒', color: '#eab308' },
+            zunyi_l: { name: '大号遵义椒', color: '#8b5cf6' },
+            zunyi_s: { name: '小号遵义椒', color: '#a78bfa' }
         };
-        
+
+        // 全局状态
         let isRecognizing = false, isSorting = false, isPlaying = true;
-        let startTime = null, timerInterval = null;
-        let counts = { millet_dr:0, millet_fr:0, millet_fg:0, lantern:0, zunyi_l:0, zunyi_s:0 };
-        
+        let startTime = null, timerInterval = null, pollInterval = null;
+        let counts = { millet_dr: 0, millet_fr: 0, millet_fg: 0, lantern: 0, zunyi_l: 0, zunyi_s: 0 };
+
         // 更新时间
         function updateTime() {
             const now = new Date();
             document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
         }
-        
+
         // 添加日志
         function addLog(message, type = 'info') {
             const container = document.getElementById('logContainer');
@@ -690,7 +1184,7 @@
             container.scrollTop = container.scrollHeight;
             if (container.children.length > 100) container.removeChild(container.firstChild);
         }
-        
+
         // 显示通知
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -702,228 +1196,391 @@
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
-        
-        // 更新计数
-        function updateCounts() {
-            const total = Object.values(counts).reduce((a, b) => a + b, 0);
-            Object.keys(counts).forEach(key => {
+
+        // 更新计数显示
+        function updateCounts(data) {
+            if (!data || !data.counts) return;
+
+            // 更新各类计数
+            Object.keys(data.counts).forEach(key => {
+                counts[key] = data.counts[key];
                 document.getElementById(`count_${key}`).textContent = counts[key];
-                const rate = total > 0 ? ((counts[key] / total) * 100).toFixed(1) : '0.0';
+            });
+
+            // 更新占比
+            const total = data.total || 1;
+            Object.keys(data.counts).forEach(key => {
+                const rate = ((data.counts[key] / total) * 100).toFixed(1);
                 document.getElementById(`rate_${key}`).textContent = `${rate}%`;
             });
-            document.getElementById('totalProcessed').textContent = total.toLocaleString();
-            document.getElementById('totalSum').textContent = total.toLocaleString();
-            const progress = Math.min((total / 1000) * 100, 100);
+
+            // 更新汇总
+            document.getElementById('totalProcessed').textContent = (data.total || 0).toLocaleString();
+            document.getElementById('totalSum').textContent = (data.total || 0).toLocaleString();
+
+            // 更新进度
+            const progress = Math.min(((data.total || 0) / 1000) * 100, 100);
             document.getElementById('progressFill').style.width = `${progress}%`;
             document.getElementById('progressPercent').textContent = `${progress.toFixed(1)}%`;
-            document.getElementById('queueCount').textContent = `${total}/1000`;
+            document.getElementById('queueCount').textContent = `${data.total || 0}/1000`;
             document.getElementById('queueProgress').style.width = `${progress}%`;
-            if (startTime && total > 0) {
+
+            // 更新处理速度
+            if (startTime && (data.total || 0) > 0) {
                 const minutes = (Date.now() - startTime) / 60000;
-                document.getElementById('perMinute').textContent = Math.round(total / minutes).toLocaleString();
+                document.getElementById('perMinute').textContent = Math.round((data.total || 0) / minutes).toLocaleString();
             }
+
+            // 更新准确率 (示例：用高置信度比例模拟)
+            if (data.confidence) {
+                document.getElementById('accuracy').textContent = `${data.confidence.high || 98.5}%`;
+                document.getElementById('overallAccuracy').textContent = `${data.confidence.high || 98.5}%`;
+            }
+
+            // 更新误判
+            document.getElementById('errorCount').textContent = data.error_count || 0;
         }
-        
-        // 更新运行时长
+
+        // ✅ 更新运行时长 (每秒调用)
         function updateRunTime() {
-            if (!startTime) return;
+            if (!startTime) {
+                document.getElementById('runTime').textContent = '00:00';
+                return;
+            }
             const seconds = Math.floor((Date.now() - startTime) / 1000);
             const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
             const secs = (seconds % 60).toString().padStart(2, '0');
             document.getElementById('runTime').textContent = `${mins}:${secs}`;
         }
-        
-        // 重置计数
-        function resetCounts() {
-            if (!confirm('确定要重置所有计数吗？')) return;
-            Object.keys(counts).forEach(key => counts[key] = 0);
-            updateCounts();
-            addLog('✓ 计数已重置', 'success');
-            showNotification('计数已重置', 'info');
-        }
-        
-        // 发送请求
-        async function sendRequest(endpoint, method = 'GET', body = null) {
-            try {
-                const config = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${AUTH_KEY}` } };
-                if (body) config.body = JSON.stringify(body);
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-                if (!response.ok) return { success: false, error: 'request_failed' };
-                return await response.json();
-            } catch (e) { return { success: false, error: 'network_error' }; }
-        }
-        
-        // 开始识别
-        async function handleStartRecognition() {
-            const btn = document.getElementById('startRecognitionBtn');
-            if (btn.classList.contains('loading') || isRecognizing) return;
-            const originalText = btn.textContent;
-            btn.classList.add('loading'); btn.disabled = true;
-            try {
-                addLog('▶ 启动识别模块...');
-                const result = await sendRequest('/recognition/start', 'POST', { mode: 'realtime', classes: Object.keys(PEPPER_CLASSES) });
-                if (result.success) {
-                    isRecognizing = true;
-                    document.getElementById('videoStatus').className = 'video-status recording';
-                    document.getElementById('videoStatus').innerHTML = '<div class="status-dot"></div><span>识别中</span>';
-                    btn.textContent = '🔄 识别中...';
-                    btn.style.borderColor = 'var(--color-success)';
-                    addLog('✓ 识别模块已启动', 'success');
-                    showNotification('识别已启动 ✓', 'success');
-                    startSimulation();
-                } else {
-                    addLog('✗ 识别启动失败', 'error');
-                    showNotification('启动失败 ✕', 'error');
-                }
-            } finally {
-                setTimeout(() => { btn.classList.remove('loading'); btn.disabled = false; if (!isRecognizing) { btn.textContent = originalText; btn.style.borderColor = ''; } }, 1500);
+
+        // ✅ 更新系统状态 (CPU/内存/FPS)
+        function updateSystemStatus(data) {
+            if (!data) return;
+            document.getElementById('cpuUsage').textContent = `${data.cpu || 0}%`;
+            document.getElementById('memoryUsage').textContent = `${data.memory || 0}%`;
+            document.getElementById('fpsRate').textContent = `${data.fps || 0} FPS`;
+
+            // 更新信号条
+            updateSignalBars(data.signal || 95);
+
+            // 更新视频状态指示
+            const statusEl = document.getElementById('videoStatus');
+            if (data.recognizing) {
+                statusEl.className = 'video-status recording';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>识别中</span>';
+            } else {
+                statusEl.className = 'video-status';
+                statusEl.innerHTML = '<div class="status-dot" style="background:var(--color-warning)"></div><span>待机</span>';
             }
         }
-        
-        // 开始分拣
-        async function handleStartSorting() {
-            const btn = document.getElementById('startSortingBtn');
-            if (btn.classList.contains('loading') || isSorting) return;
-            const originalText = btn.textContent;
-            btn.classList.add('loading'); btn.disabled = true;
-            try {
-                addLog('▶ 启动分拣执行...');
-                const result = await sendRequest('/sorting/start', 'POST', { target_classes: Object.keys(PEPPER_CLASSES), speed: 'normal' });
-                if (result.success) {
-                    isSorting = true; startTime = Date.now();
-                    if (timerInterval) clearInterval(timerInterval);
-                    timerInterval = setInterval(updateRunTime, 1000);
-                    btn.textContent = '⚙️ 分拣中...';
-                    btn.style.borderColor = 'var(--color-success)';
-                    addLog('✓ 分拣执行已启动', 'success');
-                    showNotification('分拣已启动 ✓', 'success');
-                    startSimulation();
-                } else {
-                    addLog('✗ 分拣启动失败', 'error');
-                    showNotification('启动失败 ✕', 'error');
-                }
-            } finally {
-                setTimeout(() => { btn.classList.remove('loading'); btn.disabled = false; if (!isSorting) { btn.textContent = originalText; btn.style.borderColor = ''; } }, 1500);
-            }
-        }
-        
-        // 模拟数据
-        function startSimulation() {
-            if (window.simulationInterval) clearInterval(window.simulationInterval);
-            window.simulationInterval = setInterval(() => {
-                if (!isRecognizing && !isSorting) return;
-                const classes = Object.keys(PEPPER_CLASSES);
-                const randomClass = classes[Math.floor(Math.random() * classes.length)];
-                
-                counts[randomClass]++;
-                updateCounts();
-                showDetectionBox(randomClass, 0.8 + Math.random() * 0.19);
-                
-                if (Math.random() > 0.75) {
-                    const pepper = PEPPER_CLASSES[randomClass];
-                    addLog(`✓ 识别: ${pepper.name}`, 'success');
-                }
-                
-                updateSignalBars(85 + Math.random() * 15);
-                document.getElementById('cpuUsage').textContent = `${Math.floor(40 + Math.random() * 20)}%`;
-                document.getElementById('memoryUsage').textContent = `${Math.floor(55 + Math.random() * 15)}%`;
-                document.getElementById('fpsRate').textContent = `${Math.floor(20 + Math.random() * 10)} FPS`;
-            }, 900);
-        }
-        
-        // 显示识别框
-        function showDetectionBox(className, confidence) {
-            const overlay = document.getElementById('detectionOverlay');
-            const box = document.createElement('div');
-            box.className = 'detection-box';
-            box.setAttribute('data-label', `${PEPPER_CLASSES[className].name} ${Math.round(confidence*100)}%`);
-            box.style.borderColor = PEPPER_CLASSES[className].color;
-            const x = 15 + Math.random() * 70, y = 15 + Math.random() * 70;
-            box.style.left = `${x}%`; box.style.top = `${y}%`;
-            box.style.width = `${10 + Math.random() * 15}%`; box.style.height = `${8 + Math.random() * 12}%`;
-            overlay.appendChild(box);
-            setTimeout(() => box.remove(), 2000);
-        }
-        
+
         // 更新信号条
         function updateSignalBars(strength) {
             const bars = document.querySelectorAll('.signal-bar');
             const activeCount = Math.ceil((strength / 100) * 4);
             const colorClass = activeCount <= 1 ? 'active-red' : activeCount === 2 ? 'active-yellow' : 'active';
-            bars.forEach((bar, i) => { bar.className = 'signal-bar'; if (i < activeCount) bar.classList.add(colorClass); else bar.classList.add('inactive'); });
+            bars.forEach((bar, i) => {
+                bar.className = 'signal-bar';
+                if (i < activeCount) bar.classList.add(colorClass);
+                else bar.classList.add('inactive');
+            });
         }
-        
-        // 视频控制
-        function toggleVideo() {
+
+        // 显示检测框 (前端叠加层)
+        function showDetectionBox(className, confidence) {
+            const overlay = document.getElementById('detectionOverlay');
+            const box = document.createElement('div');
+            box.className = 'detection-box';
+            // ✅ 仅显示类别 key + 置信度，无中文
+            box.setAttribute('data-label', `${className} ${Math.round(confidence * 100)}%`);
+            box.style.borderColor = PEPPER_CLASSES[className]?.color || '#00ff66';
+
+            const x = 15 + Math.random() * 70, y = 15 + Math.random() * 70;
+            box.style.left = `${x}%`;
+            box.style.top = `${y}%`;
+            box.style.width = `${10 + Math.random() * 15}%`;
+            box.style.height = `${8 + Math.random() * 12}%`;
+
+            overlay.appendChild(box);
+            setTimeout(() => box.remove(), 2000);
+        }
+
+        // 发送请求
+        async function sendRequest(endpoint, method = 'GET', body = null) {
+            try {
+                const config = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${AUTH_KEY}`
+                    }
+                };
+                if (body) config.body = JSON.stringify(body);
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                if (!response.ok) return { success: false, error: 'request_failed' };
+                return await response.json();
+            } catch (e) {
+                console.error('API 请求失败:', e);
+                return { success: false, error: 'network_error' };
+            }
+        }
+
+        // ✅ 开始识别 (对接真实接口)
+        async function handleStartRecognition() {
+            const btn = document.getElementById('startRecognitionBtn');
+            if (btn.classList.contains('loading') || isRecognizing) return;
+
+            const originalText = btn.textContent;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                addLog('▶ 启动识别模块...');
+                const result = await sendRequest('/recognition/start', 'POST', {
+                    mode: 'realtime',
+                    classes: Object.keys(PEPPER_CLASSES)
+                });
+
+                if (result.success) {
+                    isRecognizing = true;
+                    startTime = startTime || Date.now();  // 记录开始时间
+
+                    btn.textContent = '🔄 识别中...';
+                    btn.style.borderColor = 'var(--color-success)';
+
+                    addLog('✓ 识别模块已启动', 'success');
+                    showNotification('识别已启动 ✓', 'success');
+
+                    // ✅ 检测结果轮询已在页面加载时启动，这里只需标记状态
+                } else {
+                    addLog('✗ 识别启动失败: ' + (result.message || '未知错误'), 'error');
+                    showNotification('启动失败 ✕', 'error');
+                }
+            } catch (e) {
+                addLog('✗ 网络错误: ' + e.message, 'error');
+                showNotification('网络错误', 'error');
+            } finally {
+                setTimeout(() => {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    if (!isRecognizing) {
+                        btn.textContent = originalText;
+                        btn.style.borderColor = '';
+                    }
+                }, 1500);
+            }
+        }
+
+        // ✅ 开始分拣 (对接真实接口)
+        async function handleStartSorting() {
+            const btn = document.getElementById('startSortingBtn');
+            if (btn.classList.contains('loading') || isSorting) return;
+
+            const originalText = btn.textContent;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                addLog('▶ 启动分拣执行...');
+                const result = await sendRequest('/sorting/start', 'POST', {
+                    target_classes: Object.keys(PEPPER_CLASSES),
+                    speed: 'normal'
+                });
+
+                if (result.success) {
+                    isSorting = true;
+                    startTime = Date.now();  // 重置开始时间
+
+                    // 启动运行时长定时器
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerInterval = setInterval(updateRunTime, 1000);
+
+                    btn.textContent = '⚙️ 分拣中...';
+                    btn.style.borderColor = 'var(--color-success)';
+
+                    addLog('✓ 分拣执行已启动', 'success');
+                    showNotification('分拣已启动 ✓', 'success');
+
+                    // ✅ 检测结果轮询已在页面加载时启动，这里只需标记状态
+                } else {
+                    addLog('✗ 分拣启动失败', 'error');
+                    showNotification('启动失败 ✕', 'error');
+                }
+            } catch (e) {
+                addLog('✗ 网络错误', 'error');
+                showNotification('网络错误', 'error');
+            } finally {
+                setTimeout(() => {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    if (!isSorting) {
+                        btn.textContent = originalText;
+                        btn.style.borderColor = '';
+                    }
+                }, 1500);
+            }
+        }
+
+        // ✅ 停止识别
+        async function handleStopRecognition() {
+            const result = await sendRequest('/recognition/stop', 'POST');
+            if (result.success) {
+                isRecognizing = false;
+                document.getElementById('startRecognitionBtn').textContent = '🔍 开始识别';
+                document.getElementById('startRecognitionBtn').style.borderColor = '';
+                addLog('🛑 识别模块已停止', 'warning');
+                showNotification('识别已停止', 'info');
+            }
+        }
+
+        // ✅ 停止分拣
+        async function handleStopSorting() {
+            const result = await sendRequest('/sorting/stop', 'POST');
+            if (result.success) {
+                isSorting = false;
+                document.getElementById('startSortingBtn').textContent = '⚙️ 开始分拣';
+                document.getElementById('startSortingBtn').style.borderColor = '';
+                addLog('🛑 分拣执行已停止', 'warning');
+                showNotification('分拣已停止', 'info');
+            }
+        }
+
+        // ✅ 真正暂停/恢复视频流
+        async function toggleVideo() {
             isPlaying = !isPlaying;
             const btn = document.getElementById('togglePlayBtn');
             const status = document.getElementById('videoStatus');
+
             if (isPlaying) {
-                btn.textContent = '⏸️'; btn.classList.add('active');
-                status.className = 'video-status recording';
-                status.innerHTML = '<div class="status-dot"></div><span>识别中</span>';
-                addLog('▶ 视频恢复', 'info');
+                // 恢复视频流
+                await sendRequest('/stream/resume', 'POST');
+                btn.textContent = '⏸️';
+                btn.classList.add('active');
+                status.className = state.is_recognizing ? 'video-status recording' : 'video-status';
+                status.innerHTML = state.is_recognizing
+                    ? '<div class="status-dot"></div><span>识别中</span>'
+                    : '<div class="status-dot" style="background:var(--color-warning)"></div><span>待机</span>';
+                addLog('▶ 视频流已恢复', 'info');
             } else {
-                btn.textContent = '▶️'; btn.classList.remove('active');
+                // 暂停视频流
+                await sendRequest('/stream/pause', 'POST');
+                btn.textContent = '▶️';
+                btn.classList.remove('active');
                 status.className = 'video-status paused';
                 status.innerHTML = '<div class="status-dot"></div><span>已暂停</span>';
-                addLog('⏸ 视频暂停', 'warning');
+                addLog('⏸ 视频流已暂停', 'warning');
             }
         }
-        
-        function toggleFullscreen() { document.fullscreenElement ? document.exitFullscreen() : document.querySelector('.video-main').requestFullscreen(); }
+
+        // ✅ 启动数据轮询 (系统状态 + 检测结果)
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+
+            pollInterval = setInterval(async () => {
+                // 1. 获取系统状态
+                const statusResult = await sendRequest('/system/status');
+                if (statusResult.success) {
+                    updateSystemStatus(statusResult);
+                }
+
+                // 2. 获取检测结果统计 (仅在识别/分拣时)
+                if (isRecognizing || isSorting) {
+                    const detectResult = await sendRequest('/detection/results');
+                    if (detectResult.success) {
+                        updateCounts(detectResult);
+
+                        // ✅ 更新运行时长 (从后端获取或前端计算)
+                        if (detectResult.running_time) {
+                            document.getElementById('runTime').textContent = detectResult.running_time;
+                        }
+
+                        // ✅ 模拟显示检测框 (实际应从 WebSocket 接收)
+                        if (detectResult.recent && detectResult.recent.length > 0) {
+                            const latest = detectResult.recent[0];
+                            showDetectionBox(latest.class, latest.confidence);
+                        }
+                    }
+                }
+            }, 1000);  // 每秒轮询一次
+        }
+
+        // 重置计数 (对接后端)
+        async function resetCounts() {
+            if (!confirm('确定要重置所有计数吗？')) return;
+
+            const result = await sendRequest('/detection/reset', 'POST');
+            if (result.success) {
+                // 重置本地状态
+                Object.keys(counts).forEach(key => counts[key] = 0);
+                updateCounts({ counts: {}, total: 0, confidence: { high: 0 } });
+                addLog('✓ 计数已重置', 'success');
+                showNotification('计数已重置', 'info');
+            } else {
+                addLog('✗ 重置失败', 'error');
+            }
+        }
+
+        // 其他辅助函数
+        function toggleFullscreen() {
+            document.fullscreenElement ? document.exitFullscreen() : document.querySelector('.video-main').requestFullscreen();
+        }
         function captureFrame() { showNotification('截图已保存 📷', 'success'); }
         function filterByClass(className) { showNotification(`已聚焦: ${PEPPER_CLASSES[className].name}`, 'info'); }
-        
-        // ========== 日夜主题切换 ==========
+
+        // 日夜主题切换
         function toggleTheme() {
-            const current = document.documentElement.style.getPropertyValue('--bg-primary') || '#f8fafc';
-            // 判断当前是否是夜间模式 (通过背景色判断)
-            // 简单判断：如果背景色是深色，则切回白天；否则切到夜间
-            // 或者更稳健的方式：读取 localStorage 或状态变量
             let themeName = localStorage.getItem('pepper-theme') || 'day';
             themeName = themeName === 'day' ? 'night' : 'day';
             applyTheme(themeName);
         }
-        
+
         function applyTheme(themeName) {
             const theme = THEMES[themeName];
-            document.documentElement.style.cssText = ''; // 清除内联样式以便 CSS 变量生效
+            document.documentElement.style.cssText = '';
             let styleEl = document.getElementById('dynamic-theme');
-            if (!styleEl) { styleEl = document.createElement('style'); styleEl.id = 'dynamic-theme'; document.head.appendChild(styleEl); }
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-theme';
+                document.head.appendChild(styleEl);
+            }
             styleEl.textContent = theme.css;
-            
-            // 更新按钮图标
             document.getElementById('themeToggleBtn').textContent = theme.icon;
-            
-            // 保存状态
             localStorage.setItem('pepper-theme', themeName);
             addLog(`🎨 切换至: ${theme.name}`, 'info');
         }
-        
+
         // 初始化
         function init() {
             updateTime();
             setInterval(updateTime, 1000);
+
+            // ✅ 启动系统状态实时轮询 (页面加载后立即开始)
+            startPolling();
+
             updateSignalBars(95);
-            addLog('🌶️ 辣椒分拣系统 v2.3 已加载');
-            addLog('📐 布局优化 | 🌙 日夜模式已就绪');
-            
+            addLog('🌶️ 辣椒分拣系统 v3.0 已加载');
+            addLog('🔗 后端接口已对接 | 🎨 日夜模式就绪');
+
             // 加载保存的主题
             const savedTheme = localStorage.getItem('pepper-theme') || 'day';
             applyTheme(savedTheme);
-            
+
             setTimeout(() => {
                 addLog('✓ 后端连接成功', 'success');
                 showNotification('系统就绪 ✓', 'success');
             }, 1000);
         }
-        
+
+        // 页面加载
         window.addEventListener('load', init);
+
+        // 页面卸载清理
         window.addEventListener('beforeunload', () => {
             if (window.simulationInterval) clearInterval(window.simulationInterval);
             if (timerInterval) clearInterval(timerInterval);
+            if (pollInterval) clearInterval(pollInterval);
         });
     </script>
 </body>
+
 </html>
