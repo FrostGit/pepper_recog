@@ -63,20 +63,23 @@ PLACING_POSITIONS = {
 }
 
 # 机械臂姿态配置
+GRIPPER_OPEN = 2.12  # 张开夹爪姿态
+GRIPPER_CLOSED = 3.14   # 闭合夹爪姿态
+GRIPPER_HOLD = 2.95      # 夹取姿态
 GRIP_POSE = {
-    "z": -119.8311111,
-    "t": -0.122277778,
-    "r": -0.072666667,
-    "g": 1.202777778
+    "z": -119.8,
+    "t": 0.0,
+    "r": -0.20,
+    "g": GRIPPER_OPEN
 }
 
 INITIAL_POSE = {
     "x": 91.24,
     "y": 15.54,
     "z": 112.5,
-    "t": 0.078,
+    "t": 0.0,
     "r": -0.145,
-    "g": 3.141
+    "g": GRIPPER_CLOSED # 夹爪闭合姿态
 }
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -391,16 +394,18 @@ def sorting_thread():
     
     try:
         while not shutdown_event.is_set() and state.is_sorting:
-            # 机械臂抓取动作
             try:
                 if robot_arm and robot_arm.is_connected:
-                    # 1. 移动到抓取位置 (使用抓取姿态)
-                    logger.info(f"🔧 移动到抓取位置: X={arm_x:.2f}, Y={arm_y:.2f}")
+                    # 1. 机械臂先移动到初始位置
+                    x = INITIAL_POSE["x"]
+                    y = INITIAL_POSE["y"]
+                    logger.info(f"移动到初始位置: X={x:.2f}, Y={y:.2f}")
                     success = robot_arm.move_xyzt_goal(
-                        x=arm_x, y=arm_y, 
-                        z=GRIP_POSE["z"], t=GRIP_POSE["t"], 
-                        r=GRIP_POSE["r"], g=GRIP_POSE["g"]
+                        x=INITIAL_POSE["x"], y=INITIAL_POSE["y"],
+                        z=INITIAL_POSE["z"], t=INITIAL_POSE["t"],
+                        r=INITIAL_POSE["r"], g=INITIAL_POSE["g"]
                     )
+                    time.sleep(1.5)  # 等待移动完成
             except Exception as e:
                 logger.error(f"❌ 机械臂控制异常: {e}")
                 continue
@@ -454,10 +459,10 @@ def sorting_thread():
             # 机械臂抓取动作
             try:
                 if robot_arm and robot_arm.is_connected:
-                    logger.info("🤖 开始机械臂抓取流程...")
+                    logger.info("开始机械臂抓取流程...")
                     
                     # 1. 移动到抓取位置 (使用抓取姿态)
-                    logger.info(f"🔧 移动到抓取位置: X={arm_x:.2f}, Y={arm_y:.2f}")
+                    logger.info(f"移动到抓取位置: X={arm_x:.2f}, Y={arm_y:.2f}, Z={GRIP_POSE['z']:.2f}, T={GRIP_POSE['t']:.3f}, R={GRIP_POSE['r']:.3f},G={GRIP_POSE['g']:.3f}")
                     success = robot_arm.move_xyzt_goal(
                         x=arm_x, y=arm_y, 
                         z=GRIP_POSE["z"], t=GRIP_POSE["t"], 
@@ -467,27 +472,37 @@ def sorting_thread():
                         logger.error("❌ 移动到抓取位置失败")
                         continue
                     time.sleep(2)  # 等待移动完成
+                    # FIXME:
+                    exit(0)
                     
                     # 2. 闭合夹爪 (模拟)
                     logger.info("🔧 闭合夹爪")
-                    # 这里可以添加夹爪控制，如果有的话
-                    time.sleep(0.5)
+                    success = robot_arm.move_xyzt_direct(
+                        x=arm_x, y=arm_y, 
+                        z=GRIP_POSE["z"], t=GRIP_POSE["t"], 
+                        r=GRIP_POSE["r"], g=GRIPPER_HOLD
+                    )
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
                     
                     # 3. 抬起物品 (移动到安全高度)
                     logger.info("🔧 抬起物品")
-                    success = robot_arm.move_xyzt_goal(
+                    success = robot_arm.move_xyzt_direct(
                         x=arm_x, y=arm_y, 
                         z=INITIAL_POSE["z"], t=INITIAL_POSE["t"], 
-                        r=INITIAL_POSE["r"], g=INITIAL_POSE["g"]
+                        r=INITIAL_POSE["r"], g=GRIPPER_HOLD
                     )
                     if not success:
                         logger.error("❌ 抬起物品失败")
                         continue
                     time.sleep(2)
+                    exit(0)
                     
                     # 4. 移动到放置位置
                     logger.info(f"🔧 移动到放置位置: X={place_pos['x']:.2f}, Y={place_pos['y']:.2f}")
-                    success = robot_arm.move_xyzt_goal(
+                    success = robot_arm.move_xyzt_direct(
                         x=place_pos["x"], y=place_pos["y"], 
                         z=INITIAL_POSE["z"], t=INITIAL_POSE["t"], 
                         r=INITIAL_POSE["r"], g=INITIAL_POSE["g"]

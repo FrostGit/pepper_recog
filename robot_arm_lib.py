@@ -530,10 +530,12 @@ class RobotArmController:
         spd: float = 0.25, max_retries: int = 1
     ) -> bool:
         """
+        ⚠️ 注意：该指令会引起机械臂内部阻塞，同时有不准确的问题，建议使用 move_xyzt_direct 替代
+        
         CMD_XYZT_GOAL_CTRL - 机械臂末端点位置控制 (逆运动学) (T:104)
-        ⚠️ 注意：该指令会引起机械臂内部阻塞
         """
         logger.warning("发送阻塞式运动指令 T:104")
+        logger.info(f"目标位置：X={x:.2f}, Y={y:.2f}, Z={z:.2f}, T={t:.2f}, R={r:.2f}, G={g:.2f}")
         return self._send_command({
             "T": 104, "x": x, "y": y, "z": z, "t": t, "r": r, "g": g, "spd": spd
         }, max_retries=max_retries)
