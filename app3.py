@@ -464,68 +464,164 @@ def sorting_thread():
                     # TODO:
 
 
-                    # ---------------------------------------------------------------
+                     # ---------------------------------------------------------------
                     # 1. 移动到抓取位置 (使用抓取姿态)
-                    success = robot_arm.move_joints_rad(base=0.0, 
-                                                        shoulder=0.0, 
-                                                        elbow=0.0, 
-                                                        wrist=0.0, 
-                                                        roll=0.0,
-                                                        hand=0.0)
-                    if not success:
-                        logger.error("❌ 移动到抓取位置失败")
-                        continue
-                    time.sleep(2)  # 等待移动完成
-                    # ---------------------------------------------------------------
-                    # 2. 闭合夹爪 (模拟)
-                    logger.info("🔧 闭合夹爪")
-                    success = robot_arm.move_joints_rad(base=0.0, 
-                                                        shoulder=0.0, 
-                                                        elbow=0.0, 
-                                                        wrist=0.0, 
-                                                        roll=0.0,
-                                                        hand=0.0)
+                    success = robot_arm.move_joints_rad(base=0.0583, 
+                                                        shoulder=-0.8314, 
+                                                        elbow=2.5295, 
+                                                        wrist=0.1611, 
+                                                        roll=-0.0522,
+                                                        hand=3.14)
                     if not success:
                         logger.error("❌ 移动到抓取位置失败")
                         continue
                     time.sleep(2)  # 等待移动完成
                     
+                    # ---------------------------------------------------------------
+                    # 2. 闭合夹爪 (模拟)
+                    logger.info("🔧 闭合夹爪")
+                    success = robot_arm.move_joints_rad(base=0.4341, 
+                                                        shoulder=0.7777, 
+                                                        elbow=1.5140, 
+                                                        wrist=0.8575, 
+                                                        roll=0.2209,
+                                                        hand=1.5)
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
+                    
+                    logger.info("🔧 闭合夹爪")
+                    success = robot_arm.move_joints_rad(base=0.4341, 
+                                                        shoulder=0.7777, 
+                                                        elbow=1.5140, 
+                                                        wrist=0.8575, 
+                                                        roll=0.2209,
+                                                        hand=3.14)
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
                     # 3. 抬起物品 (移动到安全高度)
                     logger.info("🔧 抬起物品")
-                    success = robot_arm.move_joints_rad(base=0.0, 
-                                                        shoulder=0.0, 
-                                                        elbow=0.0, 
-                                                        wrist=0.0, 
-                                                        roll=0.0,
-                                                        hand=0.0)
+                    success = robot_arm.move_joints_rad(base=0.4326, 
+                                                        shoulder=-0.1227, 
+                                                        elbow=1.6475, 
+                                                        wrist=-0.1810, 
+                                                        roll=-0.0169,
+                                                        hand=3.14)
                     if not success:
                         logger.error("❌ 抬起物品失败")
                         continue
                     time.sleep(2)
-                    exit(0)
+                    
                     
                     # 4. 移动到放置位置
-                    success = robot_arm.move_joints_rad(base=0.0, 
-                                                        shoulder=0.0, 
-                                                        elbow=0.0, 
-                                                        wrist=0.0, 
-                                                        roll=0.0,
-                                                        hand=0.0)
+                    success = robot_arm.move_joints_rad(base=-0.3283, 
+                                                        shoulder=0.7332, 
+                                                        elbow=1.2671, 
+                                                        wrist=0.1350, 
+                                                        roll=-0.0460,
+                                                        hand=3.14)
                     if not success:
                         logger.error("❌ 移动到放置位置失败")
                         continue
                     time.sleep(2)
                     
                     # 5. 释放物品 (张开夹爪)
-                    success = robot_arm.move_joints_rad(base=0.0, 
-                                                        shoulder=0.0, 
-                                                        elbow=0.0, 
-                                                        wrist=0.0, 
-                                                        roll=0.0,
-                                                        hand=0.0)
+                    success = robot_arm.move_joints_rad(base=-0.3283, 
+                                                        shoulder=0.7332, 
+                                                        elbow=1.2671, 
+                                                        wrist=0.1350, 
+                                                        roll=-0.0460,
+                                                        hand=1.5)
                     logger.info("🔧 释放物品")
                     # 这里可以添加夹爪控制
                     time.sleep(0.5)
+                    # ---------------------------------------------------------------
+                    # 1. 移动到抓取位置 (使用抓取姿态)
+                    success = robot_arm.move_joints_rad(base=0.0583, 
+                                                        shoulder=-0.8314, 
+                                                        elbow=2.5295, 
+                                                        wrist=0.1611, 
+                                                        roll=-0.0522,
+                                                        hand=3.14)
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
+                    
+                    # ---------------------------------------------------------------
+                    # 2. 闭合夹爪 (模拟)
+                    logger.info("🔧 闭合夹爪")
+                    success = robot_arm.move_joints_rad(base=-0.2117, 
+                                                        shoulder=0.6581, 
+                                                        elbow=1.8699, 
+                                                        wrist=0.5507, 
+                                                        roll=-0.2347,
+                                                        hand=1.5)
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
+                    
+                    logger.info("🔧 闭合夹爪")
+                    success = robot_arm.move_joints_rad(base=-0.2102, 
+                                                        shoulder=0.6581, 
+                                                        elbow=1.8699, 
+                                                        wrist=0.5507, 
+                                                        roll=-0.2347,
+                                                        hand=3.14)
+                    if not success:
+                        logger.error("❌ 移动到抓取位置失败")
+                        continue
+                    time.sleep(2)  # 等待移动完成
+                    # 3. 抬起物品 (移动到安全高度)
+                    logger.info("🔧 抬起物品")
+                    success = robot_arm.move_joints_rad(base=-0.2102, 
+                                                        shoulder=-0.1365, 
+                                                        elbow=1.9236, 
+                                                        wrist=0.4786, 
+                                                        roll=-0.2378,
+                                                        hand=3.14)
+                    if not success:
+                        logger.error("❌ 抬起物品失败")
+                        continue
+                    time.sleep(2)
+                    
+                    
+                    # 4. 移动到放置位置
+                    success = robot_arm.move_joints_rad(base=-1.1167, 
+                                                        shoulder=-0.3252, 
+                                                        elbow=2.5663, 
+                                                        wrist=0.0522, 
+                                                        roll=-0.0491,
+                                                        hand=3.14)
+                    if not success:
+                        logger.error("❌ 移动到放置位置失败")
+                        continue
+                    time.sleep(2)
+                    
+                    # 5. 释放物品 (张开夹爪)
+                    success = robot_arm.move_joints_rad(base=-1.1167, 
+                                                        shoulder=-0.3252, 
+                                                        elbow=2.5663, 
+                                                        wrist=0.0522, 
+                                                        roll=-0.0491,
+                                                        hand=1.5)
+                    logger.info("🔧 释放物品")
+                    # 这里可以添加夹爪控制
+                    time.sleep(0.5)
+
+                    # ---------------------------------------------------------------
+                    # 1. 移动到抓取位置 (使用抓取姿态)
+                    success = robot_arm.move_joints_rad(base=0.0583, 
+                                                        shoulder=-0.8314, 
+                                                        elbow=2.5295, 
+                                                        wrist=0.1611, 
+                                                        roll=-0.0522,
+                                                        hand=3.14)
+                    
                     
                     logger.info(f"✅ 分拣完成: {front_class} -> ({place_pos['x']:.2f}, {place_pos['y']:.2f})")
                     
