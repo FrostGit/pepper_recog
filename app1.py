@@ -466,17 +466,16 @@ def sorting_thread():
 
                     # ---------------------------------------------------------------
                     # 1. 移动到抓取位置 (使用抓取姿态)
-                    success = robot_arm.move_joints_rad(base=0.0583, 
-                                                        shoulder=-0.8314, 
-                                                        elbow=2.5295, 
-                                                        wrist=0.1611, 
-                                                        roll=-0.0522,
-                                                        hand=3.14)
+                    success = robot_arm.move_joints_rad(base=0.0, 
+                                                        shoulder=0.0, 
+                                                        elbow=0.0, 
+                                                        wrist=0.0, 
+                                                        roll=0.0,
+                                                        hand=0.0)
                     if not success:
                         logger.error("❌ 移动到抓取位置失败")
                         continue
                     time.sleep(2)  # 等待移动完成
-                    exit(0)
                     # ---------------------------------------------------------------
                     # 2. 闭合夹爪 (模拟)
                     logger.info("🔧 闭合夹爪")

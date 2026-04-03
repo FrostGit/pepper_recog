@@ -210,11 +210,11 @@ class StatusMonitor:
         
         # 打印所有信息
         self.print_header()
-        self.print_position(status)
-        self.print_orientation(status)
+        # self.print_position(status)
+        # self.print_orientation(status)
         self.print_gripper(status)
-        # self.print_joints(status)
-        self.print_torque_status(status)
+        self.print_joints(status)
+        # self.print_torque_status(status)
         # self.print_load(status)
         # self.print_voltage(status)
         self.print_status_bar(status)

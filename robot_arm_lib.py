@@ -461,7 +461,7 @@ class RobotArmController:
 
     def move_joints_rad(
         self, base: float, shoulder: float, elbow: float, wrist: float, 
-        roll: float, hand: float, spd: int = 0, acc: int = 10,
+        roll: float, hand: float, spd: int = 0.1, acc: int = 10,
         max_retries: int = 1
     ) -> bool:
         """
